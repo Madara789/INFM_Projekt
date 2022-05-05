@@ -1,1 +1,11 @@
 \section{Kollision von Dense Units}
+
+Da die Dense Units auch in unterschiedlichen Dimensionen existieren können, müssen diese als solche gekennzeichnet werden. In diesem Schritt ist das subspace clustering erkennbar. Direkt nach Berechnung der Dense Units, werden diese mit anderen Dense Units verglichen um Höhere subspaces zu finden. Um Kollisionen in den Dense Units festzustellen, muss als erstens jedem Punkt in dem Datenset eine hohen Zufallszahl zugewiesen werden.  Dieser schritt wird vor dem ausführen des SUBSCALE Algorithmus durchgeführt. Für alle Dense Units, werden die Signaturen gebildet, diese Signatur ist die Summer aller Punkte in der Dense Unit. Anhand dieser Signatur werden die Dense Units in eine Tabelle eingetragen, mit den dazugehörigen Punkten und der Dimension. Bei einer Kollision der Signaturen, wird die Dimension zu dem bereits vorhanden Eintrag hinzugefügt (siehe Abbildung \ref{dense-collision}). \cite{Ramin}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{DenseUnitKollision.png}
+	\caption{Kollisionsauflösung von Dense Units}
+	\label{dense-collision}
+\end{figure}
+
