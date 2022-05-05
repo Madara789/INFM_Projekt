@@ -1,3 +1,25 @@
-\section{Überschrift/Heading}
+\section{Daten Aufbereitung}
 
-Hallo \cite{XX14}
+Der Subscale Algorithmus beginnt damit die Daten aufzubereiten. Dazu werden die einzelnen Punkte,
+die in jeder Dimension enthalten sind, mit einem eindeutigen Index versehen. Die Idee hinter dem
+Index besteht daraus, dass jeder Punkt eine eindeutige, hohe, zufällig gewählte Ganzzahl als
+Schlüssel erhält. Später werden die Punkte zu Partitionen zusammengefasst. Dabei bildet die Summe
+der Schlüssel die Signatur ab. Da jeder Schlüssel einen hohen Wert hat, besitzt die Summe der
+Schlüssel ebenfalls einen hohen Wert. Laut \cite{Kaur.2014} wird für eine sehr hohe Ganzzahl, bei
+sehr kleiner
+Partitionsgröße, die Anzahl der einzigartigen, Partitionen bestimmter Größe astronomisch hoch.
+Dadurch ist die Wahrscheinlichkeit, dass zwei Partitionen die gleiche Zahl als Signatur bilden
+sehr gering.
+
+Die Signaturen werden verwendet, um paarweise identische \emph{Dense Units} (siehe
+\ref{sec:chap3}) $U_1^{d_a}$, $U_2^{d_b}$ zwischen den Dimensionen $d_a$, $d_b$ zu ermitteln.
+
+
+\section{Daten Projektion}
+
+Ein Datensatz besteht aus \emph{n} Zeilen x \emph{k} Spalten, wobei eine Zeile jeweils ein Punkt
+$P^{k}$ als k-Dimensionaler Vektor in \emph{k} Spalten auftritt. Somit besteht der gesamte
+Datensatz aus $P_{n}$ Punkten.
+Der Datensazu wird zu einem Subspace S von der Größe einer Dimension projeziert, sodass sämtliche
+Punkte in einer Dimension verglichen werden können. Für die Nachbarschaftsbeziehung kann als
+Distanzmaß z.B. die euklidische Distanz angenommen werden.
