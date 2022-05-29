@@ -1,1 +1,14 @@
 \subsection{CoreSets}
+
+Der Algorithmus beginnt damit die CoreSets jeder Dimension zu bilden. Die Bildung der CoreSets
+geschieht innerhalb einer Dimension und ist zudem auch komplett unabhängig von den anderen
+Dimensionen. Dabei wird sich innerhalb einer Dimension jeder punkt angeguckt und die entfernungen
+dieses Punktes betrachtet. Sollte die Entfernung kleiner als der angegebene Epsilon wert sein, so
+wird der Punkt zu dem CoreSet hinzugefügt.
+
+Da in diesem Prozess überhaupt keine abhängigkeit von anderen Dimension besteht und einzig und
+alleine die Daten der jeweiligen Dimension benötigt wird, kann die Bildung der CoreSets für jede
+Dimension parallel abgearbeitet werden.
+
+Somit kann erreicht werden, dass jeder PC in einem Cluster nur ein Subset von Dimensionen
+abarbeitet, um die Corsets zu bilden.
