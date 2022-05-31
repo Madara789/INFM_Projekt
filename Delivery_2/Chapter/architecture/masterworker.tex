@@ -1,1 +1,25 @@
 \subsection{Master-Worker-Architektur}
+
+Viele Algoritmusschritte von Subscale können teilweise vollständig parallelisiert werden. So is es möglich, Subscale über
+ein Datenset in Arbeitspakete aufzuteilen, die dann unabhängig bearbeitet werden können. Die Arbeitspakete werden in einer
+gemeinsamen Queue abgelegt. Zum System können sich beliebig viele Worker zuschalten. Die Worker verfügen über einen Client,
+der die Kommunikationstechnologie kennt, Arbeitspakete von der Warteschlange konsumieren und je nach Arbeitspakettyp intern
+routen kann. Für jeden Arbeitsschritt existiert eine eigene Anwendung. Die Anwendung konsumiert und entpackt das Arbeitspaket,
+erledigt die Aufgabe, verpackt das Resultat in einem neuen Arbeitspaket und platziert dieses wieder in der Queue. Zwischenergebnisse
+können unterstützend in einem geeignet schnellen Persistierungslayer gespeichert werden.
+
+Vorteile:
+\begin{itemize}
+    \item Das System lässt sich einfach auf beliebig viele Instanzen skalieren
+    \item Der Algorithmus kann schrittweise parallelisiert werden
+    \item Eine Benchmarkanalyse zur Performanzsteigerung ist durch den modularen Aufbau ohne großen Mehraufwand möglich
+    \item Unterschiedliche Arbeitsschritte können mit unterschiedlichen und demzufolge den geeignetsten Technologien implementiert werden
+    \item Der modulare Aufbau ermöglich eine konfliktarme parallele Implementierung
+\end{itemize}
+
+Nachteile:
+\begin{itemize}
+    \item Es ist nicht bekannt, in wie weit die Queueing-Technologie oder der Persistierungslayer ein Bottleneck bildet
+    \item Die Fehleranalyse erfordert ein umfangreiches Logging
+    \item Asynchrone Abarbeitungen erhöhen die Aggregations- und Koordinationskomplexität
+\end{itemize}
