@@ -734,3 +734,4 @@ FodyWeavers.xsd
 
 # intellij files
 .idea
+.DS_Store

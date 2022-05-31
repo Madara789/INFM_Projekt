@@ -1,1 +1,12 @@
 \subsection{DenseUnits}
+
+Eine Dense Unit beschreibt die Menge aller Kombinationen von Punkten in einem Core Set als Tupel mit der Größe der
+minimalen Core Set Größe. Die Berechnung der Dense Units ist für jedes Core Set unabhängig.\\
+Sind die Core Sets ermittelt, so können diese an unabhängige Recheneinheiten distributiert werden. Die Recheneinheit
+erstellt dann alle Tupel des Core Sets und persistiert diese in einem geeigneten Medium.\\
+Die Dense Unit Bildung selbst kann ebenfalls weiter parallelisiert werden. Die Kombination der im Core Set enthaltenen
+Punkte erfolgt sequentiell nach Schema: Bei einer minimalen Core Set Größe von drei Punkten wird für die Bildung der
+Dense Units zunächst der Punkt 1 und 2 mit dem Punkt 3, dann 4, dann 5 usw. kombiniert: (1, 2, 3), (1, 2, 4), (1, 2, 5), ...
+Sind alle Kombinationen, die die Punkte 1 und 2 enthalten ermittelt, folgen alle Kombinationen, die die Punkte 1 und 3 enthalten:
+(1, 3, 4), (1, 3, 5), ... Das Intervall kann auf mehrere Recheneinheiten verteilt werden. Die Recheneinheiten ermitteln dann
+jeweils die Dense Units aus ihrem Intervall und legen diese im gemeinsamen Speicher ab.
