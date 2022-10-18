@@ -6,4 +6,5 @@ class ImporterInterface
 {
 public:
 	virtual Dimensions getDimensions() = 0;
+    virtual int32_t getSubspaceEntries() = 0;
 };

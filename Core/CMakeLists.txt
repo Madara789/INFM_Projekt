@@ -3,6 +3,7 @@
 file(GLOB subscaleSRC
         "*.h" "*.cpp"
         "Data/*.h" "Data/*.cpp"
+        "Exporter/*.h" "Exporter/*.cpp"
         "Importer/*.h" "Importer/*.cpp"
         "Subscale/*.h" "Subscale/*.cpp"
         "Subscale/CoreSetGenerator/*.h" "Subscale/CoreSetGenerator/*.cpp"

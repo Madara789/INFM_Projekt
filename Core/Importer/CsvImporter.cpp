@@ -27,3 +27,8 @@ Dimensions CsvImporter::getDimensions() {
 
 	return dimensions;
 }
+
+int32_t CsvImporter::getSubspaceEntries()
+{
+    return 0;
+}

@@ -10,5 +10,6 @@ private:
 public:
 	CsvImporter(char* filePath);
 	~CsvImporter();
-	Dimensions getDimensions();
+	Dimensions getDimensions() override;
+    int32_t getSubspaceEntries() override;
 };
