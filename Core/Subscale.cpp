@@ -1,25 +1,31 @@
 #include "Subscale.h"
 
+#include <vector>
+
 Subscale::Subscale(
-	DataLabelerInterface* dataLabeler,
-	CoreSetGeneratorInterface* coreSetGenerator,
-	DenseUnitGeneratorInterface* denseUnitGenerator
-) : dataLabeler_(dataLabeler), 
-	coreSetGenerator_(coreSetGenerator), 
-	denseUnitGenerator_(denseUnitGenerator) 
+	CoreSetSeekerInterface coreSetSeeker,
+	DenseUnitGeneratorInterface denseUnitGenerator,
+	SubspaceDetectorInterface subspaceDetector,
+	SubspaceCombinerInterface subspaceCombiner
+) : coreSetSeeker_(coreSetSeeker),
+	denseUnitGenerator_(denseUnitGenerator),
+	subspaceDetector_(subspaceDetector),
+	subspaceCombiner_(subspaceCombiner)
 {}
 
-Subscale::~Subscale() {
-	delete this->dataLabeler_;
-	delete this->coreSetGenerator_;
-	delete this->denseUnitGenerator_;
-}
+Clusters Subscale::getClusters(Dimensions dimensions) {
+	std::vector<CoreSets> allCoreSets;
+	for (Dimension dimension : dimensions) {
+		allCoreSets.push_back(this->coreSetSeeker_.getCoreSets(dimension);
+	}
 
-std::vector<Cluster> Subscale::getClusters(DataSet data)
-{
-	DataSet labeldData = this->dataLabeler_->label(data);
-	CoreSets coreSets = this->coreSetGenerator_->getCoreSets(labeldData);
-	DenseUnits denseUnits = this->denseUnitGenerator_->getDenseUnits(coreSets);
+	DenseUnits denseUnits = DenseUnits();
+	for (CoreSets coreSets : allCoreSets) {
+		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator_.getDenseUnits(coreSets);
+		denseUnits.insert(denseUnits.end(), denseUnitsOfDimension.begin(), denseUnitsOfDimension.end());
+	}
 
-	return {};
+	Subspaces subspaces = this->subspaceDetector_.detectSubspaces(denseUnits);
+
+	return this->subspaceCombiner_.getClusters(subspaces);
 }

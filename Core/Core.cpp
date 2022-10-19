@@ -1,13 +1,9 @@
 #include "Core.h"
 
 int main(int argc, char* argv[]) {
-	// TODO: Read data
-	DataSet data = DataSet({});
+	ImporterInterface importer = CsvImporter();
 
-	SubscaleFactoryInterface* subscaleFactory = new SequentialSubscaleFactory();
-	Subscale* subscale = subscaleFactory->make();
-	
-	Clusters cluster = subscale->getClusters(data);
+	Clusters clusters = Subscale().getClusters(importer.import());
 
 	return 0;
 }

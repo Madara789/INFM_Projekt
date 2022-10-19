@@ -2,14 +2,13 @@
 
 file(GLOB subscaleSRC
         "*.h" "*.cpp"
-        "Data/*.h" "Data/*.cpp"
-        "Exporter/*.h" "Exporter/*.cpp"
-        "Importer/*.h" "Importer/*.cpp"
         "Subscale/*.h" "Subscale/*.cpp"
-        "Subscale/CoreSetGenerator/*.h" "Subscale/CoreSetGenerator/*.cpp"
-        "Subscale/DataLabeler/*.h" "Subscale/DataLabeler/*.cpp"
+        "Subscale/CoreSetSeeker/*.h" "Subscale/CoreSetSeeker/*.cpp"
         "Subscale/DenseUnitGenerator/*.h" "Subscale/DenseUnitGenerator/*.cpp"
         "Subscale/Factory/*.h" "Subscale/Factory/*.cpp"
+        "Subscale/Importer/*.h" "Subscale/Importer/*.cpp"
+        "Subscale/SubspaceCombiner/*.h" "Subscale/SubspaceCombiner/*.cpp"
+        "Subscale/SubspaceDetector/*.h" "Subscale/SubspaceDetector/*.cpp"
         )
 
 add_executable(Core ${subscaleSRC})

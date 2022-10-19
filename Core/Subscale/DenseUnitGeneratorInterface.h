@@ -1,12 +1,9 @@
 #pragma once
 
-#include <vector>
+#include "DenseUnitGenerator/DenseUnit.h"
+#include "CoreSetSeeker/CoreSet.h"
 
-#include "../Data/CoreSet.h"
-#include "../Data/DenseUnit.h"
-
-class DenseUnitGeneratorInterface
-{
+class DenseUnitGeneratorInterface {
 public:
 	virtual DenseUnits getDenseUnits(CoreSets) = 0;
 };
