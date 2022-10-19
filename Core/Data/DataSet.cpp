@@ -15,3 +15,19 @@ unsigned int DataSet::getSize() {
 unsigned int DataSet::getDimensionSize() {
 	return this->dimensions_[0].getSize();
 }
+
+void DataSet::setMinSignature(unsigned long long newMinSignature) {
+	this->minSignature_ = newMinSignature;
+}
+
+void DataSet::setMaxSignature(unsigned long long newMaxSignature) {
+	this->maxSignature_ = newMaxSignature;
+}
+
+unsigned long long DataSet::getMinSignature() {
+	return this->minSignature_;
+}
+
+unsigned long long DataSet::getMaxSignature() {
+	return this->maxSignature_;
+}

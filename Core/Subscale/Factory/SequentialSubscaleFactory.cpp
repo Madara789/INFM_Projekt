@@ -5,7 +5,7 @@
 
 Subscale* SequentialSubscaleFactory::make() {
 	return new Subscale(
-		new SequentialDataLabeler(),
+		new SequentialDataLabeler(10, 10, 10, 10), // TODO set correct values
 		new SequentialCoreSetGenerator(),
 		new SequentialDenseUnitGenerator()
 	);

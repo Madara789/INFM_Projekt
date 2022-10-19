@@ -1,4 +1,5 @@
 #include "Subscale.h"
+#include <iostream>
 
 Subscale::Subscale(
 	DataLabelerInterface* dataLabeler,
@@ -17,8 +18,8 @@ Subscale::~Subscale() {
 
 std::vector<Cluster> Subscale::getClusters(DataSet data)
 {
-	DataSet labeldData = this->dataLabeler_->label(data);
-	CoreSets coreSets = this->coreSetGenerator_->getCoreSets(labeldData);
+	DataSet labeledData = this->dataLabeler_->label(data);
+	CoreSets coreSets = this->coreSetGenerator_->getCoreSets(labeledData);
 	DenseUnits denseUnits = this->denseUnitGenerator_->getDenseUnits(coreSets);
 
 	return {};
