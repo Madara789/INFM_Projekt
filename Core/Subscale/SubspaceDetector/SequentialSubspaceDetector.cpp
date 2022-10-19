@@ -1,5 +1,5 @@
 #include "SequentialSubspaceDetector.h"
 
-Subspaces SequentialSubspaceDetector::detectSubspaces(DenseUnits) {
-	return DenseUnits();
+Subspaces SequentialSubspaceDetector::detectSubspaces(DenseUnits denseUnits) {
+	return Subspaces({});
 }

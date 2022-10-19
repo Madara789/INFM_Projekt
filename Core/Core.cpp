@@ -1,9 +1,10 @@
 #include "Core.h"
+#include "Subscale/Factory/SequentialSubscaleFactory.h"
 
 int main(int argc, char* argv[]) {
-	ImporterInterface importer = CsvImporter();
+	ImporterInterface* importer = new CsvImporter();
 
-	Clusters clusters = Subscale().getClusters(importer.import());
+	Clusters clusters = (new SequentialSubscaleFactory())->make().getClusters(importer->import());
 
 	return 0;
 }

@@ -10,17 +10,17 @@
 class Subscale
 {
 private:
-	CoreSetSeekerInterface coreSetSeeker_;
-	DenseUnitGeneratorInterface denseUnitGenerator_;
-	SubspaceDetectorInterface subspaceDetector_;
-	SubspaceCombinerInterface subspaceCombiner_;
+	CoreSetSeekerInterface* coreSetSeeker;
+	DenseUnitGeneratorInterface* denseUnitGenerator;
+	SubspaceDetectorInterface* subspaceDetector;
+	SubspaceCombinerInterface* subspaceCombiner;
 
 public:
 	Subscale(
-		CoreSetSeekerInterface,
-		DenseUnitGeneratorInterface,
-		SubspaceDetectorInterface,
-		SubspaceCombinerInterface
+		CoreSetSeekerInterface* coreSetSeeker,
+		DenseUnitGeneratorInterface* denseUnitGenerator,
+		SubspaceDetectorInterface* subspaceDetector,
+		SubspaceCombinerInterface* subspaceCombiner
 	);
-	Clusters getClusters(Dimensions);
+	Clusters getClusters(Dimensions dimensions);
 };

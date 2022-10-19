@@ -4,5 +4,5 @@
 
 class SequentialSubspaceDetector : public SubspaceDetectorInterface {
 public:
-	Subspaces detectSubspaces(DenseUnits);
+	Subspaces detectSubspaces(DenseUnits denseUnits) override;
 };

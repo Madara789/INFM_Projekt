@@ -2,9 +2,9 @@
 
 Subscale SequentialSubscaleFactory::make() {
 	return Subscale(
-		SequentialCoreSetGenerator(2, 0.5),
-		SequentialDenseUnitGenerator(),
-		SequentialSubspaceDetector(),
-		SequentialSubspaceCombiner()
+		new SequentialCoreSetGenerator(2, 0.5),
+        new SequentialDenseUnitGenerator(),
+        new SequentialSubspaceDetector(),
+        new SequentialSubspaceCombiner()
 	);
 }

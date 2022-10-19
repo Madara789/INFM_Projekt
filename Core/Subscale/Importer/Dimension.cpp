@@ -8,6 +8,6 @@ Point* Dimension::getPoint(uint32_t index) {
 	return this->points_[index];
 }
 
-uint32_t Dimension::getSize() {
+int32_t Dimension::getSize() {
 	return this->points_.size();
 }

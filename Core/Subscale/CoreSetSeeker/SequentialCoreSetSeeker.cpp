@@ -17,14 +17,15 @@ SequentialCoreSetGenerator::SequentialCoreSetGenerator(
 CoreSets SequentialCoreSetGenerator::getCoreSets(Dimension dimension) {
     CoreSets coreSets;
 
-    for (int i = 0; i < dimension.getSize(); i++) {
-        Point referencePoint = dimension.getPoint(i);
-        CoreSet coreSet(Points([referencePoint]);
+    for (int32_t i = 0; i < dimension.getSize(); i++) {
+        Point* referencePoint = dimension.getPoint(i);
+        CoreSet coreSet;
+        coreSet.addPoint(referencePoint);
 
-        for (int j = i + 1; j < dimension.getSize(); j++) {
-            Point investiagetedPoint = dimension.getPoint(j)
-            if (std::abs(referencePoint - investiagetedPoint) < this->epsilon_) {
-                coreSet.addPoint(investiagetedPoint);
+        for (int32_t j = i + 1; j < dimension.getSize(); j++) {
+            Point* investigatedPoint = dimension.getPoint(j);
+            if (std::abs(referencePoint - investigatedPoint) < this->epsilon_) {
+                coreSet.addPoint(investigatedPoint);
             }
         }
 

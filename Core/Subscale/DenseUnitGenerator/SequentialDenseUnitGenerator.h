@@ -3,5 +3,5 @@
 #include "../DenseUnitGeneratorInterface.h"
 
 class SequentialDenseUnitGenerator : public DenseUnitGeneratorInterface {
-	DenseUnits getDenseUnits(CoreSets);
+	DenseUnits getDenseUnits(CoreSets coreSets) override;
 };

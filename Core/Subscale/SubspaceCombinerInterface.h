@@ -5,5 +5,5 @@
 
 class SubspaceCombinerInterface {
 public:
-	virtual Clusters getClusters(Subspaces) = 0;
+	virtual Clusters getClusters(Subspaces subspaces) = 0;
 };

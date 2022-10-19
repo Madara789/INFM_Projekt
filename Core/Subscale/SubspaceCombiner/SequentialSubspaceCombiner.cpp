@@ -1,6 +1,6 @@
 #include "SequentialSubspaceCombiner.h"
 
-Clusters SequentialSubspaceCombiner::getClusters(Subspaces) {
+Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 
-	return Clusters();
+	return Clusters({});
 }

@@ -4,5 +4,5 @@
 
 class SequentialSubspaceCombiner : public SubspaceCombinerInterface {
 public:
-	Clusters getClusters(Subspaces);
+	Clusters getClusters(Subspaces subspaces) override;
 };

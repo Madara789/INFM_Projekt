@@ -12,6 +12,6 @@ void CoreSet::addPoint(Point* point) {
 	this->points_.push_back(point);
 }
 
-uint32_t CoreSet::getSize() {
+int32_t CoreSet::getSize() {
 	return this->points_.size();
 }

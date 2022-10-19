@@ -1,6 +1,6 @@
 #include "SequentialDenseUnitGenerator.h"
 
-DenseUnit SequentialDenseUnitGenerator::getDenseUnits(CoreSets) {
+DenseUnits SequentialDenseUnitGenerator::getDenseUnits(CoreSets coreSets) {
 
     return DenseUnits({});
 }
