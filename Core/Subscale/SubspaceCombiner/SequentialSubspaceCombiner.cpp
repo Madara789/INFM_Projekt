@@ -1,33 +1,25 @@
 #include "SequentialSubspaceCombiner.h"
 
 #include "../Importer/Point.h"
-#include "../Importer/Dimension.h"
 
-#include <random>
 #include <map>
+#include <random>
 
-Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces)
-{
+Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 	Clusters clusters;
 
-	for (Subspace subspace : subspaces)
-	{
-		std::map<uint64_t, Point *> points;
-		for (DenseUnit denseUnit : subspace.getDenseUnits())
-		{
-			for (Point *point : denseUnit.getPoints())
-			{
-				if (points.find(point->getSignature()) == points.end())
-				{
+	for (Subspace subspace : subspaces) {
+		std::map<uint64_t, Point*> points;
+		for (DenseUnit denseUnit : subspace.getDenseUnits()) {
+			for (Point* point : denseUnit.getPoints()) {
+				if (points.find(point->getSignature()) == points.end()) {
 					points[point->getSignature()] = point;
 				}
 			}
 		}
 
 		Points subspacePoints;
-		std::map<uint64_t, Point *>::iterator it = points.begin();
-		for (std::map<uint64_t, Point *>::iterator it = points.begin(); it != points.end(); it++)
-		{
+		for (auto it = points.begin(); it != points.end(); it++) {
 			subspacePoints.push_back(it->second);
 		}
 		subspacePoints.shrink_to_fit();
@@ -67,6 +59,4 @@ Clusters SequentialSubspaceCombiner::createDummyClusters()
 	}
 
 	clusters.shrink_to_fit();
-
-	return clusters;
 }
