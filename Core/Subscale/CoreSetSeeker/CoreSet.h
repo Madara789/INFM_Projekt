@@ -12,7 +12,7 @@ public:
 	CoreSet();
 	CoreSet(Points);
 	void addPoint(Point* point);
-    int32_t getSize();
+    size_t getSize();
 };
 
 typedef std::vector<CoreSet> CoreSets;

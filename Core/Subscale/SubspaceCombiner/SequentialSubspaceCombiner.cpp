@@ -18,8 +18,7 @@ Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 		}
 
 		Points subspacePoints;
-		std::map<uint64_t, Point*>::iterator it = points.begin();
-		for (std::map<uint64_t, Point*>::iterator it = points.begin(); it != points.end(); it++) {
+		for (auto it = points.begin(); it != points.end(); it++) {
 			subspacePoints.push_back(it->second);
 		}
 		subspacePoints.shrink_to_fit();
