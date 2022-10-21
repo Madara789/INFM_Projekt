@@ -59,4 +59,6 @@ Clusters SequentialSubspaceCombiner::createDummyClusters()
 	}
 
 	clusters.shrink_to_fit();
+
+	return clusters;
 }
