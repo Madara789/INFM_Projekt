@@ -10,6 +10,7 @@ private:
 public:
 	Point(double_t value, uint64_t signature);
 	double_t getValue();
+	uint64_t getSignature();
 };
 
 typedef std::vector<Point*> Points;

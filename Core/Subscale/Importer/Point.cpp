@@ -8,3 +8,7 @@ Point::Point(
 double_t Point::getValue() {
 	return this->value_;
 }
+
+uint64_t Point::getSignature() {
+	return this->signature_;
+}
