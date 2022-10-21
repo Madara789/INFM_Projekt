@@ -1,8 +1,9 @@
 #include "Dimension.h"
 
 Dimension::Dimension(
+	uint32_t id,
 	Points points
-) : points_(points) {}
+) : id_(id),  points_(points) {}
 
 Point* Dimension::getPoint(uint32_t index) {
 	return this->points_[index];
@@ -10,4 +11,8 @@ Point* Dimension::getPoint(uint32_t index) {
 
 int32_t Dimension::getSize() {
 	return this->points_.size();
+}
+
+uint32_t Dimension::getID() {
+	return this->id_;
 }
