@@ -24,23 +24,23 @@ Dimensions CsvImporter::import() {
 	}
 
 	Dimensions transformedDimensions;
-	for (Points dimension : dimensions) {
+	for (const Points& dimension : dimensions) {
 		transformedDimensions.push_back(Dimension(dimension));
 	}
 
 	return transformedDimensions;
-
-	return Dimensions();
 }
 
 std::ifstream* CsvImporter::getFileStream() {
-	std::ifstream* input = new std::ifstream(this->filePath_);
+	auto* input = new std::ifstream(this->filePath_);
 	if (!input->is_open()) {
 		char* errorMessage = new char;
-		std::sprintf(errorMessage, "Could not read file: %s", this->filePath_);
+		sprintf(errorMessage, "Could not read file: %s", this->filePath_);
 
 		throw std::runtime_error(errorMessage);
 	}
+
+    return input;
 }
 
 std::vector<std::vector<double_t>> CsvImporter::getCsvRows(std::ifstream* input) {
