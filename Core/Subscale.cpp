@@ -29,3 +29,7 @@ Clusters Subscale::getClusters(Dimensions dimensions) {
 
 	return this->subspaceCombiner->getClusters(subspaces);
 }
+
+Clusters Subscale::createDummyClusters() {
+	return this->subspaceCombiner->createDummyClusters();
+}

@@ -24,9 +24,10 @@ Dimensions CsvImporter::import() {
 	}
 
 	Dimensions transformedDimensions;
-	for (Points dimension : dimensions) {
-		transformedDimensions.push_back(Dimension(dimension));
+	for (uint32_t i = 0; i < dimensions.size(); i++){
+		transformedDimensions.push_back(Dimension(i + 1, dimensions[i]));
 	}
+	
 
 	return transformedDimensions;
 
