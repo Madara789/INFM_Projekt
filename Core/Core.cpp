@@ -1,9 +1,6 @@
 #include "Core.h"
 #include "Subscale/Factory/SequentialSubscaleFactory.h"
 
-#include <iostream>
-#include <filesystem>
-
 int main(int argc, char *argv[])
 {
 
