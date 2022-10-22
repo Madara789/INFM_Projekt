@@ -10,7 +10,7 @@ private:
 public:
 	Dimension(uint32_t id, Points points);
 	Point* getPoint(uint32_t index);
-    int32_t getSize();
+    size_t getSize();
 	uint32_t getID();
 };
 

@@ -8,9 +8,9 @@
 Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 	Clusters clusters;
 
-	for (Subspace subspace : subspaces) {
+	for (auto [signature, subspace] : subspaces) {
 		std::map<uint64_t, Point*> points;
-		for (DenseUnit denseUnit : subspace.getDenseUnits()) {
+		for (DenseUnit denseUnit : subspace->getDenseUnits()) {
 			for (Point* point : denseUnit.getPoints()) {
 				if (points.find(point->getSignature()) == points.end()) {
 					points[point->getSignature()] = point;
@@ -24,7 +24,7 @@ Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 		}
 		subspacePoints.shrink_to_fit();
 
-		clusters.push_back(Cluster(subspace.getDimensions(), subspacePoints));
+		clusters.push_back(Cluster(subspace->getDimensions(), subspacePoints));
 	}
 
 	clusters.shrink_to_fit();
