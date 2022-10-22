@@ -5,3 +5,4 @@
 #include "Subscale/Importer/CsvImporter.h"
 #include "Subscale/Exporter/CsvClusterExporter.h"
 #include "Subscale.h"
+#include "Helper/ClusterHelper.h"

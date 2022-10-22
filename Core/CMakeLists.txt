@@ -10,6 +10,7 @@ file(GLOB subscaleSRC
         "Subscale/Exporter/*.h" "Subscale/Exporter/*.cpp"
         "Subscale/SubspaceCombiner/*.h" "Subscale/SubspaceCombiner/*.cpp"
         "Subscale/SubspaceDetector/*.h" "Subscale/SubspaceDetector/*.cpp"
+        "Helper/*.h" "Helper/*.cpp"
         )
 
 add_executable(Core ${subscaleSRC})

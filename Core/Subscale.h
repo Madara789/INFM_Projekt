@@ -23,5 +23,4 @@ public:
 		SubspaceCombinerInterface* subspaceCombiner
 	);
 	Clusters getClusters(Dimensions dimensions);
-	Clusters createDummyClusters();
 };

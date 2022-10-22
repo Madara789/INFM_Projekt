@@ -2,10 +2,8 @@
 
 #include "CsvExporter.h"
 #include "../Cluster.h"
-#include <sstream>
-#include <fstream>
-#include <memory>
 
+#include <fstream>
 #include <string>
 
 class CsvClusterExporter : public CsvExporter
