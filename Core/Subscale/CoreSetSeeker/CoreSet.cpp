@@ -5,8 +5,8 @@ CoreSet::CoreSet() {
 }
 
 CoreSet::CoreSet(
-	Points points
-): points_(points) {}
+	uint32_t dimension
+): dimension_(dimension) {}
 
 void CoreSet::addPoint(Point* point) {
 	this->points_.push_back(point);
@@ -14,4 +14,14 @@ void CoreSet::addPoint(Point* point) {
 
 size_t CoreSet::getSize() {
 	return this->points_.size();
+}
+
+uint32_t CoreSet::getDimension() const
+{
+    return dimension_;
+}
+
+const Points &CoreSet::getPoints() const
+{
+    return points_;
 }
