@@ -3,6 +3,7 @@
 #include "../Importer/Point.h"
 
 #include <vector>
+#include <cstdint>
 
 class DenseUnit {
 private:
