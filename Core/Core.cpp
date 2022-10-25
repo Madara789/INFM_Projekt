@@ -8,12 +8,10 @@ int main(int argc, char *argv[])
 
 	Clusters clusters = (new SequentialSubscaleFactory())->make().getClusters(importer->import());
 
-	auto dummyClusters = ClusterHelper::createDummyClusters();
+//	auto dummyClusters = ClusterHelper::createDummyClusters();
+//	ClusterHelper::printCluster(dummyClusters);
 
-	ClusterHelper::printCluster(dummyClusters);
-
-	ExporterInterface *exporter = new CsvClusterExporter("result/cluster.csv", dummyClusters);
-
+	ExporterInterface *exporter = new CsvClusterExporter("result/cluster.csv", clusters);
 	exporter->doExport();
 
 	return 0;
