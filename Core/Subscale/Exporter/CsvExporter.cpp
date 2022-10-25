@@ -10,7 +10,7 @@ CsvExporter::CsvExporter(std::string filePath)
 
 void CsvExporter::ensureDirectoryExists()
 {
-    uint32_t pos = filePath_.find_last_of("\\/");
+    size_t pos = filePath_.find_last_of("\\/");
     if (std::string::npos == pos)
         return;
 

@@ -1,6 +1,6 @@
 #include "DenseUnit.h"
 
-DenseUnit::DenseUnit(Points points, uint64_t signature, uint64_t dimension) {
+DenseUnit::DenseUnit(Points points, uint64_t signature, uint32_t dimension) {
     this->points_ = points;
     this->signature_ = signature;
     this->dimension_ = dimension;
@@ -16,7 +16,7 @@ uint64_t DenseUnit::getSignature() const
     return signature_;
 }
 
-uint64_t DenseUnit::getDimension() const
+uint32_t DenseUnit::getDimension() const
 {
     return dimension_;
 }
