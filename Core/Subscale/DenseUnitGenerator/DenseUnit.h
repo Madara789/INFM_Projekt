@@ -12,6 +12,7 @@ private:
 	uint32_t dimension_;
 
 public:
+	DenseUnit(Points points, uint64_t signature, uint64_t dimension);
 	Points getPoints();
 	uint64_t getSignature() const;
 	uint32_t getDimension() const;

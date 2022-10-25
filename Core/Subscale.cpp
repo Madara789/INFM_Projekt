@@ -21,7 +21,7 @@ Clusters Subscale::getClusters(Dimensions dimensions) {
 
 	DenseUnits denseUnits = DenseUnits();
 	for (CoreSets coreSets : allCoreSets) {
-		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator->getDenseUnits(coreSets);
+		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator->getDenseUnits(coreSets, 3); // FIXME minPoints through config
 		denseUnits.insert(denseUnits.end(), denseUnitsOfDimension.begin(), denseUnitsOfDimension.end());
 	}
 
