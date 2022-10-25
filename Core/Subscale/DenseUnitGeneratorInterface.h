@@ -5,5 +5,5 @@
 
 class DenseUnitGeneratorInterface {
 public:
-	virtual DenseUnits getDenseUnits(CoreSets coreSets, int minPoints) = 0;
+	virtual DenseUnits getDenseUnits(CoreSets coreSets, uint32_t minPoints) = 0;
 };
