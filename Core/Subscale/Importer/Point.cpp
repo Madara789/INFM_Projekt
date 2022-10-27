@@ -12,3 +12,9 @@ double_t Point::getValue() {
 uint64_t Point::getSignature() {
 	return this->signature_;
 }
+
+std::ostream &operator<<(std::ostream &os, const Point &point)
+{
+    os << "value_: " << point.value_ << " signature_: " << point.signature_ << "\n";
+    return os;
+}

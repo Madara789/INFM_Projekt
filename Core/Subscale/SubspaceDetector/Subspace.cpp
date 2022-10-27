@@ -21,3 +21,19 @@ void Subspace::addDenseUnit(const DenseUnit &denseUnit)
     denseUnits_.push_back(denseUnit);
     dimensions_.push_back(denseUnit.getDimension());
 }
+
+std::ostream &operator<<(std::ostream &os, const Subspace &subspace)
+{
+    for (const auto& denseUnit : subspace.denseUnits_)
+    {
+        os << denseUnit;
+    }
+
+    for (auto dimension : subspace.dimensions_)
+    {
+        os << dimension;
+    }
+
+    os << "---------------------------------------\n";
+    return os;
+}

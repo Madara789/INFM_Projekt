@@ -3,6 +3,7 @@
 #include "../Importer/Point.h"
 
 #include <vector>
+#include <ostream>
 
 class CoreSet {
 private:
@@ -16,6 +17,7 @@ public:
     size_t getSize();
     const Points &getPoints() const;
     uint32_t getDimension() const;
+    friend std::ostream &operator<<(std::ostream &os, const CoreSet &set);
 };
 
 typedef std::vector<CoreSet> CoreSets;

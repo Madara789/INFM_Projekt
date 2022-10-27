@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <ostream>
 
 class DenseUnit {
 private:
@@ -16,6 +17,7 @@ public:
 	Points getPoints();
 	uint64_t getSignature() const;
     uint32_t getDimension() const;
+    friend std::ostream &operator<<(std::ostream &os, const DenseUnit &unit);
 };
 
 typedef std::vector<DenseUnit> DenseUnits;

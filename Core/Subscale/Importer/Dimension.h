@@ -2,6 +2,7 @@
 
 #include "Point.h"
 #include <cstdint>
+#include <ostream>
 
 class Dimension {
 private:
@@ -13,6 +14,7 @@ public:
 	Point* getPoint(uint32_t index);
     size_t getSize();
 	uint32_t getID();
+    friend std::ostream &operator<<(std::ostream &os, const Dimension &dimension);
 };
 
 typedef std::vector<Dimension> Dimensions;

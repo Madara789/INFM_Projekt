@@ -25,3 +25,15 @@ const Points &CoreSet::getPoints() const
 {
     return points_;
 }
+
+std::ostream &operator<<(std::ostream &os, const CoreSet &set)
+{
+    os << "dimension: " << set.dimension_ << "\n";
+    os << "points: \n";
+    for (auto point : set.points_)
+    {
+        os << *point;
+    }
+    os << "---------------------------------------\n";
+    return os;
+}
