@@ -4,4 +4,4 @@ project ("Subscale")
 
 add_subdirectory ("Core")
 
-install(DIRECTORY data/ DESTINATION data)
+FILE(COPY data/ DESTINATION Core/Debug/data)

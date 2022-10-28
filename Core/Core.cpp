@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
 
-	ImporterInterface *importer = new CsvImporter("/data/sample5.csv");
+	ImporterInterface *importer = new CsvImporter("data/sample5.csv");
 
 	Clusters clusters = (new SequentialSubscaleFactory())->make().getClusters(importer->import());
 
