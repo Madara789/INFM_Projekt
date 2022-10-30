@@ -3,3 +3,5 @@
 project ("Subscale")
 
 add_subdirectory ("Core")
+
+FILE(COPY data/ DESTINATION Core/Debug/data)

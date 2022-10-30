@@ -1,6 +1,7 @@
 #include "SequentialCoreSetSeeker.h"
 
 #include <cmath>
+#include <iostream>
 
 SequentialCoreSetGenerator::SequentialCoreSetGenerator(
     int minPoints,
@@ -19,12 +20,12 @@ CoreSets SequentialCoreSetGenerator::getCoreSets(Dimension dimension) {
 
     for (int32_t i = 0; i < dimension.getSize(); i++) {
         Point* referencePoint = dimension.getPoint(i);
-        CoreSet coreSet;
+        CoreSet coreSet(dimension.getID());
         coreSet.addPoint(referencePoint);
 
         for (int32_t j = i + 1; j < dimension.getSize(); j++) {
             Point* investigatedPoint = dimension.getPoint(j);
-            if (std::abs(referencePoint - investigatedPoint) < this->epsilon_) {
+            if (std::abs(referencePoint->getValue() - investigatedPoint->getValue()) < this->epsilon_) {
                 coreSet.addPoint(investigatedPoint);
             }
         }

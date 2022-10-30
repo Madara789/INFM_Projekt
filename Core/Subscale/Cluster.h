@@ -3,6 +3,7 @@
 #include "Importer/Point.h"
 
 #include <vector>
+#include <ostream>
 
 
 class Cluster {
@@ -14,6 +15,7 @@ public:
 	Cluster(std::vector<uint32_t> dimensions, Points points);
 	std::vector<uint32_t> getDimensions();
 	Points getPoints();
+    friend std::ostream &operator<<(std::ostream &os, const Cluster &cluster);
 };
 
 typedef std::vector<Cluster> Clusters;
