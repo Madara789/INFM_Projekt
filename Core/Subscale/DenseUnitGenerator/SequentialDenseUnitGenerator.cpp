@@ -1,19 +1,19 @@
 #include "SequentialDenseUnitGenerator.h"
 
-DenseUnits SequentialDenseUnitGenerator::getDenseUnits(CoreSets coreSets, uint32_t minPoints)
+DenseUnits &SequentialDenseUnitGenerator::getDenseUnits(const CoreSets& coreSets, uint32_t minPoints)
 {
-    DenseUnits denseUnits;
+    auto denseUnits = new DenseUnits();
 
     for (const auto& coreSet : coreSets)
     {
         DenseUnits denseUnitsOfCoreSet = generateCombinations(coreSet, minPoints);
-        denseUnits.insert(denseUnits.end(), denseUnitsOfCoreSet.begin(), denseUnitsOfCoreSet.end());
+        denseUnits->insert(denseUnits->end(), denseUnitsOfCoreSet.begin(), denseUnitsOfCoreSet.end());
     }
 
-    return denseUnits;
+    return *denseUnits;
 }
 
-void SequentialDenseUnitGenerator::generateAllCombinationsOfCoreSet(Points points, Points combinations[], uint32_t start, uint32_t end, uint32_t currentIndex, uint32_t sizeOfCombinations)
+void SequentialDenseUnitGenerator::generateAllCombinationsOfCoreSet(const Points& points, Points combinations[], uint32_t start, uint32_t end, uint32_t currentIndex, uint32_t sizeOfCombinations)
 {
     if (currentIndex == sizeOfCombinations)
         return;
@@ -26,10 +26,10 @@ void SequentialDenseUnitGenerator::generateAllCombinationsOfCoreSet(Points point
     }
 }
 
-DenseUnits SequentialDenseUnitGenerator::generateCombinations(CoreSet coreSet, const uint32_t minPoints)
+DenseUnits SequentialDenseUnitGenerator::generateCombinations(const CoreSet& coreSet, const uint32_t minPoints)
 {
     auto* combinations = new Points[minPoints];
-    generateAllCombinationsOfCoreSet(coreSet.getPoints(), combinations, 0, (uint32_t) coreSet.getSize() - 1, 0, minPoints);
+    generateAllCombinationsOfCoreSet(coreSet.getPoints(), combinations, 0, (uint32_t) coreSet.getPoints().size() - 1, 0, minPoints);
 
     DenseUnits denseUnitsOfCoreSet;
     auto* iterator = combinations;

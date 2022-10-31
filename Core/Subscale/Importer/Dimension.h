@@ -11,9 +11,9 @@ private:
 
 public:
 	Dimension(uint32_t id, Points points);
-	Point* getPoint(uint32_t index);
-    size_t getSize();
-	uint32_t getID();
+    [[nodiscard]] const Points &getPoints() const;
+    [[nodiscard]] uint32_t getId() const;
+
     friend std::ostream &operator<<(std::ostream &os, const Dimension &dimension);
 };
 

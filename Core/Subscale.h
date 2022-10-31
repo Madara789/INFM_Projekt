@@ -22,5 +22,5 @@ public:
 		SubspaceDetectorInterface* subspaceDetector,
 		SubspaceCombinerInterface* subspaceCombiner
 	);
-	Clusters getClusters(Dimensions dimensions);
+	Clusters getClusters(const Dimensions& dimensions);
 };

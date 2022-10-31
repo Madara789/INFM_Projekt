@@ -15,27 +15,27 @@ SequentialCoreSetGenerator::SequentialCoreSetGenerator(
  * 
  * @return All CoreSets which were indentified in the Dimension
  */
-CoreSets SequentialCoreSetGenerator::getCoreSets(Dimension dimension) {
-    CoreSets coreSets;
+CoreSets &SequentialCoreSetGenerator::getCoreSets(const Dimension &dimension) {
+    auto coreSets = new CoreSets();
 
-    for (int32_t i = 0; i < dimension.getSize(); i++) {
-        Point* referencePoint = dimension.getPoint(i);
-        CoreSet coreSet(dimension.getID());
+    for (int32_t i = 0; i < dimension.getPoints().size(); i++) {
+        Point* referencePoint = dimension.getPoints()[i];
+        CoreSet coreSet(dimension.getId());
         coreSet.addPoint(referencePoint);
 
-        for (int32_t j = i + 1; j < dimension.getSize(); j++) {
-            Point* investigatedPoint = dimension.getPoint(j);
+        for (int32_t j = i + 1; j < dimension.getPoints().size(); j++) {
+            Point* investigatedPoint = dimension.getPoints()[j];
             if (std::abs(referencePoint->getValue() - investigatedPoint->getValue()) < this->epsilon_) {
                 coreSet.addPoint(investigatedPoint);
             }
         }
 
-        if (coreSet.getSize() >= this->minPoints_) {
-            coreSets.push_back(coreSet);
+        if (coreSet.getPoints().size() >= this->minPoints_) {
+            coreSets->push_back(coreSet);
         }
     }
 
-    coreSets.shrink_to_fit();
+    coreSets->shrink_to_fit();
 
-    return coreSets;
+    return *coreSets;
 }

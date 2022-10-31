@@ -1,20 +1,21 @@
 #include "Dimension.h"
 
+#include <utility>
+
 Dimension::Dimension(
 	uint32_t id,
 	Points points
-) : id_(id),  points_(points) {}
+) : id_(id),  points_(std::move(points)) {}
 
-Point* Dimension::getPoint(uint32_t index) {
-	return this->points_[index];
+
+const Points &Dimension::getPoints() const
+{
+    return this->points_;
 }
 
-size_t Dimension::getSize() {
-	return this->points_.size();
-}
-
-uint32_t Dimension::getID() {
-	return this->id_;
+uint32_t Dimension::getId() const
+{
+    return this->id_;
 }
 
 std::ostream &operator<<(std::ostream &os, const Dimension &dimension)

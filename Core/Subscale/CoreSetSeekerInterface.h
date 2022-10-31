@@ -5,5 +5,5 @@
 
 class CoreSetSeekerInterface {
 public:
-	virtual CoreSets getCoreSets(Dimension dimension) = 0;
+	virtual CoreSets &getCoreSets(const Dimension& dimension) = 0;
 };

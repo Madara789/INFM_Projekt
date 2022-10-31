@@ -11,5 +11,5 @@ private:
 
 public:
 	SequentialCoreSetGenerator(int minPoints, double epsilon);
-	CoreSets getCoreSets(Dimension dimension) override;
+	CoreSets &getCoreSets(const Dimension& dimension) override;
 };
