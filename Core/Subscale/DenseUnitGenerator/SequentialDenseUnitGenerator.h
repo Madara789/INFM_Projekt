@@ -5,10 +5,15 @@
 class SequentialDenseUnitGenerator : public DenseUnitGeneratorInterface
 {
 private:
-	DenseUnits generateCombinations(const CoreSet& coreSet, uint32_t sizeOfCombinations);
-	void generateAllCombinationsOfCoreSet(const Points& points, Points denseUnits[], uint32_t start, uint32_t end, uint32_t currentIndex, uint32_t sizeOfCombinations);
-	static uint64_t calculateSignatureFromPoints(const Points& points);
+	DenseUnits generateDenseUnits(const CoreSet &coreSet, const uint32_t minPoints);
+	void calculateCombinations(const Points &points, Points combinations[], const uint32_t minPoints);
+	Points *generateTmpPoints(const uint32_t minPoints);
+	void fillCombinationToLeft(Points tmpCombination[], const Points &points, uint32_t &depth, uint32_t &pointIndex);
+	void addNewCombination(Points combinations[], const Points tmpCombination[]);
+	bool replaceCombinationWithNewPoint(Points ka[], uint32_t &depth, const Points &points, uint32_t &pointIndex);
+	void calculateNewPointIndex(uint32_t &pointIndex, uint32_t &depth, const Points tmpCombination[], const Points &points);
+	uint64_t calculateSignature(const Points &points);
 
 public:
-	DenseUnits &getDenseUnits(const CoreSets& coreSets, uint32_t minPoints) override;
+	DenseUnits &getDenseUnits(const CoreSets &coreSets, const uint32_t minPoints) override;
 };
