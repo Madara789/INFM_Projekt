@@ -5,17 +5,18 @@
 #include <chrono>
 
 Subscale::Subscale(
-	CoreSetSeekerInterface* coreSetSeeker,
-	DenseUnitGeneratorInterface* denseUnitGenerator,
-	SubspaceDetectorInterface* subspaceDetector,
-	SubspaceCombinerInterface* subspaceCombiner
-) : coreSetSeeker(coreSetSeeker),
-    denseUnitGenerator(denseUnitGenerator),
-    subspaceDetector(subspaceDetector),
-    subspaceCombiner(subspaceCombiner)
+        DataLabelerInterface* dataLabeler,
+        CoreSetSeekerInterface* coreSetSeeker,
+        DenseUnitGeneratorInterface* denseUnitGenerator,
+        SubspaceDetectorInterface* subspaceDetector,
+        SubspaceCombinerInterface* subspaceCombiner
+        ) : dataLabeler(dataLabeler), coreSetSeeker(coreSetSeeker), denseUnitGenerator(denseUnitGenerator), subspaceDetector(subspaceDetector), subspaceCombiner(subspaceCombiner)
 {}
 
 Clusters Subscale::getClusters(const Dimensions& dimensions) {
+    auto minMaxTuple = this->dataLabeler->label(dimensions);
+    std::cout << "Min Signature: " << std::get<0>(minMaxTuple) << " Max Signature: " << std::get<1>(minMaxTuple) << std::endl;
+
 	std::vector<CoreSets> allCoreSets;
     std::cout << "creating CoreSets \n";
 	for (const Dimension& dimension : dimensions) {
