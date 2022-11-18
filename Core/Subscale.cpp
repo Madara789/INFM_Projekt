@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include "Helper/Config.h"
 
 Subscale::Subscale(
         DataLabelerInterface* dataLabeler,
@@ -30,7 +31,7 @@ Clusters Subscale::getClusters(const Dimensions& dimensions) {
     DenseUnits denseUnits;
 	for (auto coreSets : allCoreSets) {
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator->getDenseUnits(coreSets, 3); // FIXME minPoints through config
+		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator->getDenseUnits(coreSets, Config::get()->getMinPoints());
         std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() << "s" << std::endl;
 		denseUnits.insert(denseUnits.end(), denseUnitsOfDimension.begin(), denseUnitsOfDimension.end());
         coreSets.clear();

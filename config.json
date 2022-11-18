@@ -1,0 +1,6 @@
+{
+  "minPoints": 2,
+  "minLabel": 1e14,
+  "maxLabel": 2e14,
+  "epsilon": 0.5
+}

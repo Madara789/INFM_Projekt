@@ -4,11 +4,13 @@
 #include "../DenseUnitGenerator/SequentialDenseUnitGenerator.h"
 #include "../SubspaceDetector/SequentialSubspaceDetector.h"
 #include "../SubspaceCombiner/SequentialSubspaceCombiner.h"
+#include "../../Helper/Config.h"
 
 Subscale SequentialSubscaleFactory::make() {
+    auto config = Config::get();
 	return {
-            new SequentialDataLabeler(2, 1e14, 2e14), // TODO add through Config
-		    new SequentialCoreSetGenerator(2, 0.5), // TODO add through Config
+            new SequentialDataLabeler(config->getMinPoints(), config->getMinLabel(), config->getMaxLabel()),
+		    new SequentialCoreSetGenerator(config->getMinPoints(), config->getEpsilon()),
             new SequentialDenseUnitGenerator(),
             new SequentialSubspaceDetector(),
             new SequentialSubspaceCombiner()
