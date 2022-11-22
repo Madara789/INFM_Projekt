@@ -14,6 +14,7 @@ public:
 	Point(double_t value, uint64_t signature);
 	double_t getValue();
 	uint64_t getSignature();
+    void setSignature(uint64_t signature);
     friend std::ostream &operator<<(std::ostream &os, const Point &point);
 };
 

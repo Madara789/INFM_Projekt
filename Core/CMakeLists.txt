@@ -5,6 +5,7 @@ file(GLOB subscaleSRC
         "Subscale/*.h" "Subscale/*.cpp"
         "Subscale/CoreSetSeeker/*.h" "Subscale/CoreSetSeeker/*.cpp"
         "Subscale/DataLabeler/*.h" "Subscale/DataLabeler/*.cpp"
+        "Subscale/DenseUnitCombiner/*.h" "Subscale/DenseUnitCombiner/*.cpp"
         "Subscale/DenseUnitGenerator/*.h" "Subscale/DenseUnitGenerator/*.cpp"
         "Subscale/Factory/*.h" "Subscale/Factory/*.cpp"
         "Subscale/Importer/*.h" "Subscale/Importer/*.cpp"

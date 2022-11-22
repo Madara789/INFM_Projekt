@@ -10,8 +10,9 @@ private:
 	const char* filePath_;
 
 public:
-	CsvImporter(const char* filePath);
-	Dimensions import();
+	explicit CsvImporter(const char* filePath);
+	Dimensions import() override;
+    ~CsvImporter() override = default;
 
 private:
 	std::ifstream* getFileStream();

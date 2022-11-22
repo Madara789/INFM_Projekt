@@ -5,4 +5,5 @@
 class ImporterInterface {
 public:
 	virtual Dimensions import() = 0;
+    virtual ~ImporterInterface() = default;
 };

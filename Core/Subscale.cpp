@@ -4,41 +4,64 @@
 #include <iostream>
 #include <chrono>
 #include "Helper/Config.h"
+#include "Subscale/Exporter/CsvDenseUnitExporter.h"
 
 Subscale::Subscale(
         DataLabelerInterface* dataLabeler,
         CoreSetSeekerInterface* coreSetSeeker,
         DenseUnitGeneratorInterface* denseUnitGenerator,
+        DenseUnitCombinerInterface* denseUnitCombiner,
         SubspaceDetectorInterface* subspaceDetector,
         SubspaceCombinerInterface* subspaceCombiner
-        ) : dataLabeler(dataLabeler), coreSetSeeker(coreSetSeeker), denseUnitGenerator(denseUnitGenerator), subspaceDetector(subspaceDetector), subspaceCombiner(subspaceCombiner)
+        ) : dataLabeler(dataLabeler), coreSetSeeker(coreSetSeeker), denseUnitGenerator(denseUnitGenerator), denseUnitCombiner(denseUnitCombiner) ,subspaceDetector(subspaceDetector), subspaceCombiner(subspaceCombiner)
 {}
 
-Clusters Subscale::getClusters(const Dimensions& dimensions) {
-    auto minMaxTuple = this->dataLabeler->label(dimensions);
-    std::cout << "Min Signature: " << std::get<0>(minMaxTuple) << " Max Signature: " << std::get<1>(minMaxTuple) << std::endl;
+Clusters Subscale::getClusters(Dimensions& dimensions) {
+    auto labeledData = this->dataLabeler->label(dimensions);
+    delete this->dataLabeler;
 
 	std::vector<CoreSets> allCoreSets;
-    std::cout << "creating CoreSets \n";
 	for (const Dimension& dimension : dimensions) {
-        allCoreSets.push_back(coreSetSeeker->getCoreSets(dimension));
+        allCoreSets.push_back(this->coreSetSeeker->getCoreSets(dimension));
     }
-
+    delete this->coreSetSeeker;
+    dimensions.clear();
     allCoreSets.shrink_to_fit();
-    std::cout << allCoreSets.size() << "\n";
 
-    std::cout << "creating DenseUnits for all CoreSets \n";
-    DenseUnits denseUnits;
-	for (auto coreSets : allCoreSets) {
-        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-		DenseUnits denseUnitsOfDimension = this->denseUnitGenerator->getDenseUnits(coreSets, Config::get()->getMinPoints());
-        std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() << "s" << std::endl;
-		denseUnits.insert(denseUnits.end(), denseUnitsOfDimension.begin(), denseUnitsOfDimension.end());
-        coreSets.clear();
+    uint32_t slices = 0;
+    uint32_t splittingFactor = Config::get()->getSplittingFactor();
+    uint64_t deltaSig = (labeledData->getMaxSignature() - labeledData->getMinSignature()) / splittingFactor;
+    for (uint32_t j = 0; j < splittingFactor; j++)
+    {
+        uint32_t i = (j + splittingFactor / 2) % splittingFactor;
+        uint64_t minSigBoundary = labeledData->getMinSignature() + i * deltaSig;
+        uint64_t maxSigBoundary = 0;
+
+        if (i < splittingFactor - 1)
+            maxSigBoundary = minSigBoundary + deltaSig;
+        else
+            maxSigBoundary = labeledData->getMaxSignature() + 1;
+
+        auto denseUnitsOfSplit = this->denseUnitGenerator->getDenseUnits(allCoreSets, Config::get()->getMinPoints(), minSigBoundary, maxSigBoundary, labeledData->getLabels());
+
+        std::stringstream s;
+        s << "temp/slice-" << slices << ".csv";
+        CsvDenseUnitExporter exporter(s.str(), *denseUnitsOfSplit);
+        exporter.doExport();
+        slices++;
     }
+    delete this->denseUnitGenerator;
     allCoreSets.clear();
 
-	Subspaces subspaces = this->subspaceDetector->detectSubspaces(denseUnits);
+    auto denseUnits = this->denseUnitCombiner->getDenseUnits(slices);
 
-	return this->subspaceCombiner->getClusters(subspaces);
+	Subspaces subspaces = this->subspaceDetector->detectSubspaces(*denseUnits);
+    denseUnits->clear();
+    delete this->subspaceDetector;
+
+    auto clusters = this->subspaceCombiner->getClusters(subspaces);
+    subspaces.clear();
+    delete this->subspaceCombiner;
+
+	return clusters;
 }

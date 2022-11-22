@@ -3,14 +3,13 @@
 
 #include <tuple>
 #include "Importer/Dimension.h"
+#include "DataLabeler/LabeledData.h"
 
 class DataLabelerInterface
 {
 public:
-    /**
-     * Return a Tuple of minSignature and maxSignature
-     */
-    virtual std::tuple<uint64_t, uint64_t> label(const Dimensions& dimensions) = 0;
+    virtual LabeledData *label(const Dimensions& dimensions) = 0;
+    virtual ~DataLabelerInterface() = default;
 };
 
 #endif //SUBSCALE_DATALABELERINTERFACE_H

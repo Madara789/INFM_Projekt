@@ -1,3 +1,4 @@
+#include <iostream>
 #include "SequentialDataLabeler.h"
 
 SequentialDataLabeler::SequentialDataLabeler(int32_t minPoints, uint64_t minLabel, uint64_t maxLabel)
@@ -7,10 +8,9 @@ SequentialDataLabeler::SequentialDataLabeler(int32_t minPoints, uint64_t minLabe
     this->minPoints_ = minPoints;
 }
 
-std::tuple<uint64_t, uint64_t> SequentialDataLabeler::label(const Dimensions &dimensions)
+LabeledData *SequentialDataLabeler::label(const Dimensions &dimensions)
 {
-    int32_t numberOfLabels = 0;
-    std::for_each(dimensions.begin(), dimensions.end(), [&numberOfLabels](const Dimension &dimension) { numberOfLabels += dimension.getPoints().size();});
+    int32_t numberOfLabels = dimensions.begin()->getPoints().size();
     labels_ = new uint64_t[numberOfLabels];
     std::random_device rd;
     auto gen = std::mt19937_64(rd());
@@ -20,7 +20,7 @@ std::tuple<uint64_t, uint64_t> SequentialDataLabeler::label(const Dimensions &di
         labels_[i] = minLabel_ + dis(gen) * (maxLabel_ - minLabel_);
     }
 
-    return std::make_tuple(calcMinSignature(numberOfLabels), calcMaxSignature(numberOfLabels));
+    return new LabeledData(calcMinSignature(numberOfLabels), calcMaxSignature(numberOfLabels), labels_);
 }
 
 uint64_t SequentialDataLabeler::calcMinSignature(int32_t numberOfLabels)

@@ -1,7 +1,5 @@
 #include "SequentialSubspaceCombiner.h"
 
-#include "../Importer/Point.h"
-
 #include <map>
 
 Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {

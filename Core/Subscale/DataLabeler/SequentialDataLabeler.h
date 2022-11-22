@@ -17,10 +17,11 @@ private:
     uint64_t calcMinSignature(int32_t numberOfLabels);
     uint64_t calcMaxSignature(int32_t numberOfLabels);
     std::set<uint64_t> fillWithFirstMinPoints();
+    ~SequentialDataLabeler() override { delete labels_; };
 
 public:
     SequentialDataLabeler(int minPoints, uint64_t minLabel, uint64_t maxLabel);
-    std::tuple<uint64_t, uint64_t> label(const Dimensions& dimensions) override;
+    LabeledData *label(const Dimensions& dimensions) override;
 };
 
 #endif //SUBSCALE_SEQUENTIALDATALABELER_H

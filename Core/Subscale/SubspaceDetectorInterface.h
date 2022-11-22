@@ -6,4 +6,5 @@
 class SubspaceDetectorInterface {
 public:
 	virtual Subspaces detectSubspaces(DenseUnits denseUnits) = 0;
+    virtual ~SubspaceDetectorInterface() = default;
 };

@@ -1,12 +1,10 @@
 #include "DenseUnit.h"
 
-DenseUnit::DenseUnit(Points points, uint64_t signature, uint32_t dimension) {
-    this->points_ = points;
-    this->signature_ = signature;
-    this->dimension_ = dimension;
-}
+#include <utility>
 
-    Points DenseUnit::getPoints()
+DenseUnit::DenseUnit(Points points, uint64_t signature, uint32_t dimension) : points_(std::move(points)), signature_(signature), dimension_(dimension) {}
+
+Points DenseUnit::getPoints()
 {
     return this->points_;
 }

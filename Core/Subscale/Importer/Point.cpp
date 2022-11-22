@@ -18,3 +18,8 @@ std::ostream &operator<<(std::ostream &os, const Point &point)
     os << "value_: " << point.value_ << " signature_: " << point.signature_ << "\n";
     return os;
 }
+
+void Point::setSignature(uint64_t signature)
+{
+    signature_ = signature;
+}

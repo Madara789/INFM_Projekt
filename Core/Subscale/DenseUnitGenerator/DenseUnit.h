@@ -15,8 +15,8 @@ private:
 public:
 	DenseUnit(Points points, uint64_t signature, uint32_t dimension);
 	Points getPoints();
-	uint64_t getSignature() const;
-    uint32_t getDimension() const;
+	[[nodiscard]] uint64_t getSignature() const;
+    [[nodiscard]] uint32_t getDimension() const;
     friend std::ostream &operator<<(std::ostream &os, const DenseUnit &unit);
 };
 

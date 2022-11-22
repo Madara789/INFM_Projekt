@@ -6,4 +6,5 @@ class SequentialSubscaleFactory : public SubscaleFactoryInterface
 {
 public:
 	Subscale make() override;
+    ~SequentialSubscaleFactory() override = default;
 };

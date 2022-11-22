@@ -17,6 +17,7 @@ public:
     uint64_t getMinLabel();
     uint64_t getMaxLabel();
     double getEpsilon();
+    uint32_t getSplittingFactor();
 };
 
 

@@ -54,3 +54,12 @@ double Config::getEpsilon()
 
     return 0.5;
 }
+
+uint32_t Config::getSplittingFactor()
+{
+    if (data.contains("splittingFactor")) {
+        return data["splittingFactor"].get<uint32_t>();
+    }
+
+    return 0;
+}

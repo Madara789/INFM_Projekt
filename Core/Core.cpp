@@ -4,8 +4,12 @@
 int main(int argc, char *argv[])
 {
 	ImporterInterface *importer = new CsvImporter("data/sample5.csv");
+    auto dimensions = importer->import();
+    delete importer;
 
-	Clusters clusters = (new SequentialSubscaleFactory())->make().getClusters(importer->import());
+    SubscaleFactoryInterface* factory = new SequentialSubscaleFactory();
+    Clusters clusters = factory->make().getClusters(dimensions);
+    delete factory;
 
 //	auto dummyClusters = ClusterHelper::createDummyClusters();
 //	ClusterHelper::printCluster(dummyClusters);

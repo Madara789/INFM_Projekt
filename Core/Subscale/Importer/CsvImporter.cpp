@@ -17,10 +17,12 @@ Dimensions CsvImporter::import() {
 	size_t amountDimensions = csvRows[0].size();
 	std::vector<Points> dimensions = std::vector<Points>(amountDimensions);
 
+    uint32_t rowIndex = 0;
 	for (std::vector<double_t> row : csvRows) {
 		for (int i = 0; i < row.size(); i++) {
-			dimensions[i].push_back(new Point(row[i], 1)); // TODO: Replace 1 by high number
+			dimensions[i].push_back(new Point(row[i], rowIndex));
 		}
+        rowIndex++;
 	}
 
 	Dimensions transformedDimensions;
@@ -28,7 +30,7 @@ Dimensions CsvImporter::import() {
 		transformedDimensions.push_back(Dimension(i + 1, dimensions[i]));
 	}
 	
-
+    delete input;
 	return transformedDimensions;
 }
 
