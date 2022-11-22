@@ -1,16 +1,20 @@
 #include "SequentialDenseUnitGenerator.h"
 
-DenseUnits &SequentialDenseUnitGenerator::getDenseUnits(const CoreSets& coreSets, uint32_t minPoints)
+DenseUnits &SequentialDenseUnitGenerator::getDenseUnits(const CoreSets& coreSets, uint32_t minPoints,  uint64_t min, uint64_t max)
 {
-    auto denseUnits = new DenseUnits();
+    auto denseUnits = DenseUnits();
 
     for (const auto& coreSet : coreSets)
     {
         DenseUnits denseUnitsOfCoreSet = generateCombinations(coreSet, minPoints);
-        denseUnits->insert(denseUnits->end(), denseUnitsOfCoreSet.begin(), denseUnitsOfCoreSet.end());
+        for (uint32_t i{}; i < denseUnitsOfCoreSet.size(); i++){
+            if (denseUnitsOfCoreSet[i].getSignature() >= min || denseUnitsOfCoreSet[i].getSignature() <= max){
+                denseUnits.push_back(denseUnitsOfCoreSet[i]);
+            }
+        }
     }
 
-    return *denseUnits;
+    return denseUnits;
 }
 
 void SequentialDenseUnitGenerator::generateAllCombinationsOfCoreSet(const Points& points, Points combinations[], uint32_t start, uint32_t end, uint32_t currentIndex, uint32_t sizeOfCombinations)

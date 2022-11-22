@@ -10,5 +10,5 @@ private:
 	static uint64_t calculateSignatureFromPoints(const Points& points);
 
 public:
-	DenseUnits &getDenseUnits(const CoreSets& coreSets, uint32_t minPoints) override;
+	DenseUnits &getDenseUnits(const CoreSets& coreSets, uint32_t minPoints,  uint64_t min, uint64_t max) override;
 };

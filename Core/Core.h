@@ -6,3 +6,4 @@
 #include "Subscale/Exporter/CsvClusterExporter.h"
 #include "Subscale.h"
 #include "Helper/ClusterHelper.h"
+#include "Subscale/DataLabeler/SequentialDataLabeler.h"

@@ -3,24 +3,29 @@
 
 #include <random>
 #include <set>
-#include "../DataLabelerInterface.h"
-#include "../Importer/Dimension.h"
 
-class SequentialDataLabeler: public DataLabelerInterface
+// class for generating labels
+class LabelGenerator
 {
 private:
-    int32_t minPoints_;
-    uint64_t *labels_;
-    uint64_t minLabel_;
-    uint64_t maxLabel_;
-
-    uint64_t calcMinSignature(int32_t numberOfLabels);
-    uint64_t calcMaxSignature(int32_t numberOfLabels);
-    std::set<uint64_t> fillWithFirstMinPoints();
-
+	std::random_device rd;
+	std::mt19937_64 gen;
+	std::uniform_real_distribution<double> dis;
+	unsigned long long minLabel;
+	unsigned long long maxLabel;
 public:
-    SequentialDataLabeler(int minPoints, uint64_t minLabel, uint64_t maxLabel);
-    std::tuple<uint64_t, uint64_t> label(const Dimensions& dimensions) override;
+	LabelGenerator(unsigned long long minLabel, unsigned long long maxLabel);
+	void getLabels(unsigned long long* labels, int numberOfLabels);
+
+	unsigned long long calcMinSignature(unsigned long long* labels, int numberOfLabels, int minPoints);
+	unsigned long long calcMaxSignature(unsigned long long* labels, int numberOfLabels, int minPoints);
+
+	void getLabelsForVector(std::vector<unsigned long long>& labels, int numberOfLabels);
+
+	unsigned long long calcMinSignatureFromVector(std::vector<unsigned long long>& labels, int numberOfLabels, int minPoints);
+	unsigned long long calcMaxSignatureFromVector(std::vector<unsigned long long>& labels, int numberOfLabels, int minPoints);
+
+	unsigned long long getRandomLabel();
 };
 
 #endif //SUBSCALE_SEQUENTIALDATALABELER_H

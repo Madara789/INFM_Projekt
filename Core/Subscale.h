@@ -6,12 +6,10 @@
 #include "Subscale/SubspaceCombinerInterface.h"
 #include "Subscale/Cluster.h"
 #include "Subscale/Importer/Dimension.h"
-#include "Subscale/DataLabelerInterface.h"
 
 class Subscale
 {
 private:
-    DataLabelerInterface* dataLabeler;
 	CoreSetSeekerInterface* coreSetSeeker;
 	DenseUnitGeneratorInterface* denseUnitGenerator;
 	SubspaceDetectorInterface* subspaceDetector;
@@ -19,11 +17,11 @@ private:
 
 public:
 	Subscale(
-            DataLabelerInterface* dataLabelerInterface,
             CoreSetSeekerInterface* coreSetSeeker,
             DenseUnitGeneratorInterface* denseUnitGenerator,
             SubspaceDetectorInterface* subspaceDetector,
             SubspaceCombinerInterface* subspaceCombiner
             );
 	Clusters getClusters(const Dimensions& dimensions);
+    Subspaces getSubspaceTable(const Dimensions& dimensions, uint64_t min, uint64_t max);
 };

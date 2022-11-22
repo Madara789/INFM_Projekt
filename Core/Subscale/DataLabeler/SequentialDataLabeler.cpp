@@ -1,94 +1,177 @@
 #include "SequentialDataLabeler.h"
 
-SequentialDataLabeler::SequentialDataLabeler(int32_t minPoints, uint64_t minLabel, uint64_t maxLabel)
+#include <set>
+
+// Constructor
+LabelGenerator::LabelGenerator(unsigned long long minLabel, unsigned long long maxLabel)
 {
-    this->minLabel_ = minLabel;
-    this->maxLabel_ = maxLabel;
-    this->minPoints_ = minPoints;
+	gen = std::mt19937_64(rd()); // //Standard mersenne_twister_engine seeded with rd()
+	dis = std::uniform_real_distribution<double>(0, 1); // Generator for uniformily distributed doubles between 0 and 1
+
+	this->minLabel = minLabel;
+	this->maxLabel = maxLabel;
 }
 
-std::tuple<uint64_t, uint64_t> SequentialDataLabeler::label(const Dimensions &dimensions)
-{
-    int32_t numberOfLabels = 0;
-    std::for_each(dimensions.begin(), dimensions.end(), [&numberOfLabels](const Dimension &dimension) { numberOfLabels += dimension.getPoints().size();});
-    labels_ = new uint64_t[numberOfLabels];
-    std::random_device rd;
-    auto gen = std::mt19937_64(rd());
-    auto dis = std::uniform_real_distribution<double>(0, 1);
-    for (int i = 0; i < numberOfLabels; i++)
-    {
-        labels_[i] = minLabel_ + dis(gen) * (maxLabel_ - minLabel_);
-    }
+void LabelGenerator::getLabelsForVector(std::vector<unsigned long long>& labels, int numberOfLabels) {
 
-    return std::make_tuple(calcMinSignature(numberOfLabels), calcMaxSignature(numberOfLabels));
+	for (int i = 0; i < numberOfLabels; i++)
+	{
+		labels.push_back(getRandomLabel());
+	}
 }
 
-uint64_t SequentialDataLabeler::calcMinSignature(int32_t numberOfLabels)
-{
-    std::set<uint64_t> minLabels;
+unsigned long long LabelGenerator::calcMinSignatureFromVector(std::vector<unsigned long long>& labels, int numberOfLabels, int minPoints) {
 
-    minLabels = fillWithFirstMinPoints();
+	unsigned long long minSignature = 0;
+	std::set<unsigned long long> minLabels;
 
-    for (int i = minPoints_; i < numberOfLabels; i++)
-    {
-        bool labelSmallerThanGreatestMinLabel = labels_[i] < *(--minLabels.end());
-        if (labelSmallerThanGreatestMinLabel)
-        {
-            bool minLabelNotContainsLabel = minLabels.count(labels_[i]) == 0;
-            if (minLabelNotContainsLabel)
-            {
-                minLabels.erase(--minLabels.end());
-                minLabels.insert(labels_[i]);
-            }
-        }
-    }
+	// fill minLabels with the first minPoints labels
+	for (int i = 0; i < minPoints; i++)
+	{
+		minLabels.insert(labels[i]);
+	}
 
-    uint64_t minSignature = 0;
-    for (uint64_t label : minLabels)
-    {
-        minSignature += label;
-    }
+	for (int i = minPoints; i < numberOfLabels; i++)
+	{
+		// check if label is smaller than the greatest label in minLabels
+		if (labels[i] < *(--minLabels.end()))
+		{
+			// check if minLabels already contains label
+			if (minLabels.count(labels[i]) == 0)
+			{
+				// insert label into minLabels and erase the greatest label
+				minLabels.erase(--minLabels.end());
+				minLabels.insert(labels[i]);
+			}
+		}
+	}
 
-    return minSignature;
+	// calculate minSignature by accumalating all minLabels
+	for (unsigned long long label : minLabels)
+	{
+		minSignature += label;
+	}
+
+	return minSignature;
+
+}
+unsigned long long LabelGenerator::calcMaxSignatureFromVector(std::vector<unsigned long long>& labels, int numberOfLabels, int minPoints) {
+	unsigned long long maxSignature = 0;
+	std::set<unsigned long long> maxLabels;
+
+	// fill maxLabels with the first minPoints labels
+	for (int i = 0; i < minPoints; i++)
+	{
+		maxLabels.insert(labels[i]);
+	}
+
+	for (int i = minPoints; i < numberOfLabels; i++)
+	{
+		// check if label is greater than the smallest label in maxLabels
+		if (labels[i] > *(maxLabels.begin()))
+		{
+			// check if maxLabels already contains label
+			if (maxLabels.count(labels[i]) == 0)
+			{
+				// insert label into maxLabels and erase the smallest label
+				maxLabels.erase(maxLabels.begin());
+				maxLabels.insert(labels[i]);
+			}
+		}
+	}
+
+	// calculate maxSignature by accumalating all maxLabels
+	for (unsigned long long label : maxLabels)
+	{
+		maxSignature += label;
+	}
+
+	return maxSignature;
 }
 
-uint64_t SequentialDataLabeler::calcMaxSignature(int32_t numberOfLabels)
+// generates random labels and stores them in the given array
+void LabelGenerator::getLabels(unsigned long long* labels, int numberOfLabels)
 {
-    std::set<uint64_t> maxLabels;
-
-    maxLabels = fillWithFirstMinPoints();
-
-    for (int i = minPoints_; i < numberOfLabels; i++)
-    {
-        bool labelGreaterThanSmallestMaxLabel = labels_[i] > *(maxLabels.begin());
-        if (labelGreaterThanSmallestMaxLabel)
-        {
-            bool maxLabelNotContainsLabel = maxLabels.count(labels_[i]) == 0;
-            if (maxLabelNotContainsLabel)
-            {
-                maxLabels.erase(maxLabels.begin());
-                maxLabels.insert(labels_[i]);
-            }
-        }
-    }
-
-    uint64_t maxSignature = 0;
-    for (uint64_t label : maxLabels)
-    {
-        maxSignature += label;
-    }
-
-    return maxSignature;
+	for (int i = 0; i < numberOfLabels; i++)
+	{
+		labels[i] = getRandomLabel();
+	}
 }
 
-std::set<uint64_t> SequentialDataLabeler::fillWithFirstMinPoints()
+// calculates the minimal signature that can result from the given labels
+unsigned long long LabelGenerator::calcMinSignature(unsigned long long* labels, int numberOfLabels, int minPoints)
 {
-    std::set<uint64_t> minLabels;
+	unsigned long long minSignature = 0;
+	std::set<unsigned long long> minLabels;
 
-    for (int i = 0; i < minPoints_; i++)
-    {
-        minLabels.insert(labels_[i]);
-    }
+	// fill minLabels with the first minPoints labels
+	for (int i = 0; i < minPoints; i++)
+	{
+		minLabels.insert(labels[i]);
+	}
 
-    return minLabels;
+	for (int i = minPoints; i < numberOfLabels; i++)
+	{
+		// check if label is smaller than the greatest label in minLabels
+		if (labels[i] < *(--minLabels.end()))
+		{
+			// check if minLabels already contains label
+			if (minLabels.count(labels[i]) == 0)
+			{
+				// insert label into minLabels and erase the greatest label
+				minLabels.erase(--minLabels.end());
+				minLabels.insert(labels[i]);
+			}
+		}
+	}
+
+	// calculate minSignature by accumalating all minLabels
+	for (unsigned long long label : minLabels)
+	{
+		minSignature += label;
+	}
+
+	return minSignature;
+}
+
+// calculates the maximal signature that can result from the given labels
+unsigned long long LabelGenerator::calcMaxSignature(unsigned long long* labels, int numberOfLabels, int minPoints)
+{
+	unsigned long long maxSignature = 0;
+	std::set<unsigned long long> maxLabels;
+
+	// fill maxLabels with the first minPoints labels
+	for (int i = 0; i < minPoints; i++)
+	{
+		maxLabels.insert(labels[i]);
+	}
+
+	for (int i = minPoints; i < numberOfLabels; i++)
+	{
+		// check if label is greater than the smallest label in maxLabels
+		if (labels[i] > *(maxLabels.begin()))
+		{
+			// check if maxLabels already contains label
+			if (maxLabels.count(labels[i]) == 0)
+			{
+				// insert label into maxLabels and erase the smallest label
+				maxLabels.erase(maxLabels.begin());
+				maxLabels.insert(labels[i]);
+			}
+		}
+	}
+
+	// calculate maxSignature by accumalating all maxLabels
+	for (unsigned long long label : maxLabels)
+	{
+		maxSignature += label;
+	}
+
+	return maxSignature;
+}
+
+// generates a random label
+unsigned long long LabelGenerator::getRandomLabel()
+{
+	return minLabel + dis(gen) * (maxLabel-minLabel);
 }
