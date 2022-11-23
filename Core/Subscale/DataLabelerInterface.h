@@ -8,7 +8,7 @@
 class DataLabelerInterface
 {
 public:
-    virtual LabeledData *label(const Dimensions& dimensions) = 0;
+    virtual LabeledData *label(uint64_t numberOfLabels) = 0;
     virtual ~DataLabelerInterface() = default;
 };
 

@@ -1,7 +1,7 @@
 {
-  "minPoints": 2,
+  "minPoints": 3,
   "minLabel": 1e14,
   "maxLabel": 2e14,
-  "epsilon": 0.5,
+  "epsilon": 0.02,
   "splittingFactor" : 10
 }

@@ -12,7 +12,6 @@
 class Subscale
 {
 private:
-    DataLabelerInterface* dataLabeler;
 	CoreSetSeekerInterface* coreSetSeeker;
 	DenseUnitGeneratorInterface* denseUnitGenerator;
     DenseUnitCombinerInterface* denseUnitCombiner;
@@ -21,12 +20,11 @@ private:
 
 public:
 	Subscale(
-            DataLabelerInterface* dataLabelerInterface,
             CoreSetSeekerInterface* coreSetSeeker,
             DenseUnitGeneratorInterface* denseUnitGenerator,
             DenseUnitCombinerInterface* denseUnitCombiner,
             SubspaceDetectorInterface* subspaceDetector,
             SubspaceCombinerInterface* subspaceCombiner
             );
-	Clusters getClusters(Dimensions& dimensions);
+	Clusters getClusters(Dimensions& dimensions, uint64_t minSignature, uint64_t maxSignature);
 };

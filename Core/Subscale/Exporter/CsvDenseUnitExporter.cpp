@@ -14,10 +14,13 @@ void CsvDenseUnitExporter::doExport()
     const auto bufferSize = 50000000;
     auto buffer = new char[bufferSize];
 
-    std::ofstream file(filePath_.c_str());
+    std::ofstream resetFile(filePath_.c_str(), std::ios::trunc);
+    resetFile.close();
+    std::ofstream file(filePath_.c_str(), std::ios::app);
 
     unsigned int bufferIndex = 0;
     int len;
+    int i = 0;
 
     // signature, dimension, [[Point.signature(), Point.value()], ..]
     for (auto denseUnit : denseUnits)
@@ -47,6 +50,15 @@ void CsvDenseUnitExporter::doExport()
 
         buffer[bufferIndex++] = ']';
         buffer[bufferIndex++] = '\n';
+        if (i == 100000)
+        {
+            file.write(buffer, bufferIndex);
+            delete[] buffer;
+            buffer = new char[bufferSize];
+            bufferIndex = 0;
+            i = 0;
+        }
+        i++;
     }
 
     file.write(buffer, bufferIndex);

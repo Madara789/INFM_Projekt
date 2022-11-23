@@ -9,29 +9,33 @@ CsvImporter::CsvImporter(
 	const char* filePath
 ) : filePath_(filePath) {}
 
-Dimensions CsvImporter::import() {
-	std::ifstream* input = this->getFileStream();
-	std::vector<std::vector<double_t>> csvRows = this->getCsvRows(input);
-	input->close();
+std::tuple<Dimensions, uint64_t, uint64_t> CsvImporter::import(DataLabelerInterface* dataLabeler) {
+    std::ifstream *input = this->getFileStream();
+    std::vector<std::vector<double_t>> csvRows = this->getCsvRows(input);
+    input->close();
 
-	size_t amountDimensions = csvRows[0].size();
-	std::vector<Points> dimensions = std::vector<Points>(amountDimensions);
+    const auto numberOfPoints = csvRows.size();
 
-    uint32_t rowIndex = 0;
-	for (std::vector<double_t> row : csvRows) {
-		for (int i = 0; i < row.size(); i++) {
-			dimensions[i].push_back(new Point(row[i], rowIndex));
-		}
-        rowIndex++;
-	}
+    auto labeledData = dataLabeler->label(numberOfPoints);
+    unsigned long long minSignature = labeledData->getMinSignature();
+    unsigned long long maxSignature = labeledData->getMaxSignature();
 
-	Dimensions transformedDimensions;
-	for (uint32_t i = 0; i < dimensions.size(); i++){
-		transformedDimensions.push_back(Dimension(i + 1, dimensions[i]));
-	}
-	
+    size_t amountDimensions = csvRows[0].size();
+    Dimensions dimensions = Dimensions();
+    dimensions.reserve(amountDimensions);
+
+    for (size_t i = 0; i < amountDimensions; i++)
+    {
+        Points points = Points();
+        for (int j = 0; j < numberOfPoints; j++)
+        {
+            points.push_back(new Point(csvRows[j][i], labeledData->getLabels()[j]));
+        }
+        dimensions.push_back(Dimension(i + 1, points));
+    }
+
     delete input;
-	return transformedDimensions;
+    return { dimensions, minSignature, maxSignature };
 }
 
 std::ifstream* CsvImporter::getFileStream() {

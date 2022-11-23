@@ -27,13 +27,13 @@ DenseUnits *SequentialDenseUnitCombiner::getDenseUnits(uint32_t slices)
             while (std::getline(ss, token, '['))
             {
                 std::stringstream values(token);
-                uint32_t pointId = 0;
-                values >> pointId;
+                uint64_t pointSignature = 0;
+                values >> pointSignature;
                 values.ignore();
                 double value = 0.0;
                 values >> value;
 
-                points.push_back(new Point(value, pointId));
+                points.push_back(new Point(value, pointSignature));
             }
 
             if (points.size() > 1)

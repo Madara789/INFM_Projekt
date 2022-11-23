@@ -26,6 +26,11 @@ Clusters SequentialSubspaceCombiner::getClusters(Subspaces subspaces) {
 
 	clusters.shrink_to_fit();
 
+    clusters.erase(std::remove_if(clusters.begin(), clusters.end(), [&](const Cluster& cluster)
+    {
+       return cluster.getPoints().size() <= 1 || cluster.getDimensions().size() <= 1;
+    }), clusters.end());
+
 	return clusters;
 }
 

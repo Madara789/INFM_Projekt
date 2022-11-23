@@ -13,8 +13,8 @@ private:
 
 public:
 	Cluster(std::vector<uint32_t> dimensions, Points points);
-	std::vector<uint32_t> getDimensions();
-	Points getPoints();
+    [[nodiscard]] const std::vector<uint32_t> &getDimensions() const;
+    [[nodiscard]] const Points &getPoints() const;
     friend std::ostream &operator<<(std::ostream &os, const Cluster &cluster);
 };
 

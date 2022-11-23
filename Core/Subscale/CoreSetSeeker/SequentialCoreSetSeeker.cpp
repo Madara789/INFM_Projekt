@@ -26,6 +26,7 @@ CoreSets &SequentialCoreSetGenerator::getCoreSets(const Dimension &dimension) {
         for (int32_t j = i + 1; j < dimension.getPoints().size(); j++) {
             Point* investigatedPoint = dimension.getPoints()[j];
             if (std::abs(referencePoint->getValue() - investigatedPoint->getValue()) < this->epsilon_) {
+//            if (referencePoint->getValue() - investigatedPoint->getValue() <= this->epsilon_) {
                 coreSet.addPoint(investigatedPoint);
             }
         }

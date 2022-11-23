@@ -5,6 +5,6 @@
 
 class DenseUnitGeneratorInterface {
 public:
-	virtual DenseUnits *getDenseUnits(const std::vector<CoreSets>& coreSets, uint32_t minPoints, uint64_t minSigBoundary, uint64_t maxSigBoundary, const uint64_t* labeledData) = 0;
+	virtual DenseUnits *getDenseUnits(const std::vector<CoreSets>& coreSets, uint32_t minPoints, uint64_t minSigBoundary, uint64_t maxSigBoundary) = 0;
     virtual ~DenseUnitGeneratorInterface() = default;
 };

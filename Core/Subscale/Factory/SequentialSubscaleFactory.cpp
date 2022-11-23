@@ -10,7 +10,6 @@
 Subscale SequentialSubscaleFactory::make() {
     auto config = Config::get();
 	return {
-            new SequentialDataLabeler(config->getMinPoints(), config->getMinLabel(), config->getMaxLabel()),
 		    new SequentialCoreSetGenerator(config->getMinPoints(), config->getEpsilon()),
             new SequentialDenseUnitGenerator(),
             new SequentialDenseUnitCombiner(),

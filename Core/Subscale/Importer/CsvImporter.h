@@ -11,7 +11,7 @@ private:
 
 public:
 	explicit CsvImporter(const char* filePath);
-	Dimensions import() override;
+    std::tuple<Dimensions, uint64_t, uint64_t> import(DataLabelerInterface*) override;
     ~CsvImporter() override = default;
 
 private:

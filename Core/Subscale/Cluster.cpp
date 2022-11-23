@@ -1,16 +1,20 @@
 #include "Cluster.h"
 
+#include <utility>
+
 Cluster::Cluster(
 	std::vector<uint32_t> dimensions,
 	Points points
-) : dimensions_(dimensions), points_(points) {}
+) : dimensions_(std::move(dimensions)), points_(std::move(points)) {}
 
-std::vector<uint32_t> Cluster::getDimensions() {
-	return this->dimensions_;
+const std::vector<uint32_t> &Cluster::getDimensions() const
+{
+    return dimensions_;
 }
 
-Points Cluster::getPoints() {
-	return this->points_;
+const Points &Cluster::getPoints() const
+{
+    return points_;
 }
 
 std::ostream &operator<<(std::ostream &os, const Cluster &cluster)

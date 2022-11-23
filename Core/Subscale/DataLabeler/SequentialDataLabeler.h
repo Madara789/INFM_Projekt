@@ -9,19 +9,19 @@
 class SequentialDataLabeler: public DataLabelerInterface
 {
 private:
-    int32_t minPoints_;
-    uint64_t *labels_;
+    uint32_t minPoints_;
+    uint64_t *labels_{};
     uint64_t minLabel_;
     uint64_t maxLabel_;
 
-    uint64_t calcMinSignature(int32_t numberOfLabels);
-    uint64_t calcMaxSignature(int32_t numberOfLabels);
+    uint64_t calcMinSignature(uint64_t numberOfLabels);
+    uint64_t calcMaxSignature(uint64_t numberOfLabels);
     std::set<uint64_t> fillWithFirstMinPoints();
     ~SequentialDataLabeler() override { delete labels_; };
 
 public:
-    SequentialDataLabeler(int minPoints, uint64_t minLabel, uint64_t maxLabel);
-    LabeledData *label(const Dimensions& dimensions) override;
+    SequentialDataLabeler(uint32_t minPoints, uint64_t minLabel, uint64_t maxLabel);
+    LabeledData *label(uint64_t numberOfLabels) override;
 };
 
 #endif //SUBSCALE_SEQUENTIALDATALABELER_H

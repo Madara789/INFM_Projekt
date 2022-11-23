@@ -1,61 +1,91 @@
 #include <iostream>
 #include "SequentialDenseUnitGenerator.h"
 
-DenseUnits *SequentialDenseUnitGenerator::getDenseUnits(const std::vector<CoreSets>& coreSets, uint32_t minPoints, uint64_t minSigBoundary, uint64_t maxSigBoundary, const uint64_t* labeledData)
+DenseUnits *SequentialDenseUnitGenerator::getDenseUnits(const std::vector<CoreSets>& coreSets, uint32_t minPoints, uint64_t minSigBoundary, uint64_t maxSigBoundary)
 {
     auto denseUnits = new DenseUnits();
-
+    auto* combs = new uint64_t[3];
     for (const auto& coreSetOfDimension : coreSets) {
         for (const auto& coreSet : coreSetOfDimension)
         {
-            DenseUnits denseUnitsOfCoreSet = generateCombinations(coreSet, minPoints, minSigBoundary, maxSigBoundary, labeledData);
-            denseUnits->insert(denseUnits->end(), denseUnitsOfCoreSet.begin(), denseUnitsOfCoreSet.end());
+            uint64_t possibleCombinations = choose(coreSet.getPoints().size(), minPoints);
+            uint32_t countCombs = 0;
+            for (uint64_t i = 0; i <= possibleCombinations; ++i)
+            {
+                elements(i, coreSet.getPoints().size(), minPoints, combs);
+
+                uint64_t signature = 0;
+                for (uint32_t j = 0; j < minPoints; ++j)
+                    signature += coreSet.getPoints()[combs[j]]->getSignature();
+
+                if (signature >= minSigBoundary && signature < maxSigBoundary)
+                {
+                    Points pCombs;
+                    for (uint32_t j = 0; j < minPoints; ++j)
+                    {
+                        pCombs.push_back(coreSet.getPoints()[combs[j]]);
+                    }
+                    denseUnits->push_back(DenseUnit(pCombs, signature, coreSet.getDimension()));
+                }
+                countCombs++;
+            }
         }
     }
 
+    delete[] combs;
     return denseUnits;
 }
 
-void SequentialDenseUnitGenerator::generateAllCombinationsOfCoreSet(const Points& points, Points combinations[], uint32_t start, uint32_t end, uint32_t currentIndex, uint32_t sizeOfCombinations)
+uint64_t SequentialDenseUnitGenerator::choose(uint64_t n, uint64_t k)
 {
-    if (currentIndex == sizeOfCombinations)
-        return;
+    if (n < k)
+        return 0;
 
-    // The condition "end - i + 1 >= sizeOfCombinations - currentIndex" makes sure that including one element at index will make a combination with remaining elements at remaining positions
-    for (uint32_t i = start; i < end && end - i + 1 >= sizeOfCombinations - currentIndex; i++)
+    if (n == k)
+        return 1;
+
+    uint64_t delta, iMax;
+
+    if (k < (n - k))
     {
-        combinations[currentIndex].push_back(points[i]);
-        generateAllCombinationsOfCoreSet(points, combinations, start, end, currentIndex + 1, sizeOfCombinations);
+        delta = n - k;
+        iMax = k;
+    } else
+    {
+        delta = k;
+        iMax = n - k;
     }
+
+    uint64_t ans = delta + 1;
+    for (uint64_t i = 2; i <= iMax; ++i)
+        ans = (ans * (delta + i)) / i;
+
+    return ans;
 }
 
-DenseUnits SequentialDenseUnitGenerator::generateCombinations(const CoreSet& coreSet, const uint32_t minPoints, uint64_t minSigBoundary, uint64_t maxSigBoundary, const uint64_t* labeledData)
+uint64_t SequentialDenseUnitGenerator::largestV(uint64_t a, uint64_t b, uint64_t x)
 {
-    auto* combinations = new Points[minPoints];
-    generateAllCombinationsOfCoreSet(coreSet.getPoints(), combinations, 0, (uint32_t) coreSet.getPoints().size() - 1, 0, minPoints);
-
-    DenseUnits denseUnitsOfCoreSet;
-    auto* iterator = combinations;
-    for (uint32_t i = 0; i < minPoints; i++)
-    {
-        uint64_t signature = calculateSignatureFromPoints(*iterator, labeledData);
-
-        if (signature >= minSigBoundary && signature < maxSigBoundary)
-            denseUnitsOfCoreSet.push_back(DenseUnit(*iterator, signature, coreSet.getDimension()));
-
-        iterator++;
-    }
-    delete[] combinations;
-
-    return denseUnitsOfCoreSet;
+    uint64_t v = a - 1;
+    while (choose(v, b) > x)
+        --v;
+    return v;
 }
 
- uint64_t SequentialDenseUnitGenerator::calculateSignatureFromPoints(const Points& points, const uint64_t* labeledData)
+void SequentialDenseUnitGenerator::elements(uint64_t m, uint64_t n, uint64_t k, uint64_t* ans)
 {
-    uint64_t signature = 0;
-    for (auto point : points)
+    uint64_t maxM = choose(n, k) - 1;
+
+    uint64_t a = n;
+    uint64_t b = k;
+    uint64_t x = maxM - m;
+    for (uint64_t i = 0; i < k; ++i)
     {
-        signature += labeledData[point->getSignature()];
+        ans[i] = largestV(a, b, x);
+        x = x - choose(ans[i], b);
+        a = ans[i];
+        b = b - 1;
     }
-    return signature;
+
+    for (uint64_t i = 0; i < k; ++i)
+        ans[i] = (n - 1) - ans[i];
 }
