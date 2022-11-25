@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# GRPC Generated Files
+Proto/generated/
+
 # User-specific files
 *.rsuser
 *.suo

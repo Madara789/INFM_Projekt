@@ -14,5 +14,5 @@ target_link_libraries(myproto
 target_include_directories(myproto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
-protobuf_generate(TARGET myproto LANGUAGE cpp)
-protobuf_generate(TARGET myproto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+protobuf_generate(TARGET myproto LANGUAGE cpp PROTOC_OUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+protobuf_generate(TARGET myproto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}" PROTOC_OUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/generated)
