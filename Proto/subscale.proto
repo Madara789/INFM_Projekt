@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package subscale;
+
+service SubscaleRoutes {
+    rpc RemoteSubscale (SubscaleData) returns (SubspaceTable);
+}
+
+message SubscaleData {
+    int64 id = 1;
+}
+
+message SubspaceTable {
+    int64 id = 1;
+}
