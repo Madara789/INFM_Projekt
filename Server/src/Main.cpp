@@ -1,16 +1,16 @@
-#include "../../SubscaleGPU/CsvDataHandler/CsvDataHandler.h"
-#include "../../SubscaleGPU/SubscaleTypes.h"
-#include "../../SubscaleGPU/Subscale/Subscale.h"
-#include "../../SubscaleGPU/Subscale/SubscaleSeq.h"
-#include "../../SubscaleGPU/Clustering/Clustering.h"
-#include "../../SubscaleGPU/Remote/Remote.h"
-#include "../../SubscaleGPU/TimeMeasurement/TimeMeasurement.h"
-#include "../../SubscaleGPU/SubscaleConfig/SubscaleConfig.h"
+#include "CsvDataHandler/CsvDataHandler.h"
+#include "SubscaleTypes.h"
+#include "Subscale/Subscale.h"
+#include "Subscale/SubscaleSeq.h"
+#include "Clustering/Clustering.h"
+#include "Remote/Remote.h"
+#include "TimeMeasurement/TimeMeasurement.h"
+#include "SubscaleConfig/SubscaleConfig.h"
 #include <string>
 #include <chrono>
 #include <stdio.h>
 #include <tuple>
-#include "../../SubscaleGPU/HelperFunctions/roundingFunctions.h"
+#include "HelperFunctions/roundingFunctions.h"
 #include <fstream>
 #include <iostream>
 

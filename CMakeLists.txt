@@ -6,6 +6,7 @@ set(CMAKE_TOOLCHAIN_FILE include/vcpkg/scripts/buildsystems/vcpkg.cmake)
 # additional compiler flags (needed for mlpack)
 set(GCC_COVERAGE_COMPILE_FLAGS) # "-fopenmp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+set(VCPKG_TARGET_TRIPLET x64-linux)
 
 include(include/vcpkg/scripts/buildsystems/vcpkg.cmake)
 

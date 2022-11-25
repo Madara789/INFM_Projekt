@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.17)
 
-# ATTENTION: nlohmann_json has to be installed with vcpkg before compilation
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
-find_package(Protobuf CONFIG REQUIRED)
 find_path(MLPACK_INCLUDE_DIRS "mlpack/mlpack.hpp")
 
 file(GLOB subscaleSRC
-        "src/Main.cpp"
         "*.h" "*.cpp" "*.cuh" "*.cu"
         "BinomialCoeffCreator/*.cuh" "BinomialCoeffCreator/*.cu"
         "Client/*.h" "Client/*.cpp"
@@ -30,11 +26,11 @@ file(GLOB subscaleSRC
         "Remote/*.h" "Remote/*.cpp"
         )
 
-add_executable(subscale ${subscaleSRC})
+add_library(subscale-lib SHARED ${subscaleSRC})
 
 # compilation properties for CUDA
-set_target_properties(subscale PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_ARCHITECTURES 70)
-target_compile_options(subscale PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
+set_target_properties(subscale-lib PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_ARCHITECTURES 70)
+target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
 
 # link libraries (ATTENTION: change the path of mlpack to compile the code)
-target_link_libraries(subscale PUBLIC nlohmann_json nlohmann_json::nlohmann_json gRPC::grpc++)
+target_link_libraries(subscale-lib PUBLIC nlohmann_json nlohmann_json::nlohmann_json)
