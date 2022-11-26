@@ -215,7 +215,7 @@ std::tuple<LocalSubspaceTable*, unsigned int> ISubscale::calculateClusterCandida
 	auto numberOfDimensions = points[0].values.size();
 	// Shrink allocated memory of vector
 	points.shrink_to_fit();
-	printf("Number of Points: %llu   Number of Dimensions: %d\n", points.size(), numberOfDimensions);
+	printf("Number of Points: %lu   Number of Dimensions: %ld\n", points.size(), numberOfDimensions);
 
 	CoreSetCreator* coreSetCreator = new CoreSetCreator();
 

@@ -47,14 +47,24 @@ public:
 
         if (status.ok())
         {
+            LocalSubspaceTable* table = new LocalSubspaceTable(response.idssize(), response.dimensionssize(), response.tablesize());
+            for (int i = 0; i < response.idssize(); ++i)
+            {
+                uint32_t id = response.ids(i);
+                table->insertIds(&id, i);
+            }
+
+            for (int i = 0; i < response.dimensionssize(); ++i)
+            {
+                uint32_t dimension = response.dimensions(i);
+                table->insertDimensions(&dimension, i);
+            }
             std::cout << "OK" << std::endl;
-        }
-        else
-        {
-            std::cout << "Nicht OK" << std::endl;
+
+            return std::make_tuple(table, response.id());
         }
 
-        return {};
+        throw std::runtime_error("GRPC Request Failed");
     }
 
 private:
