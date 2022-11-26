@@ -3,13 +3,23 @@ syntax = "proto3";
 package subscale;
 
 service SubscaleRoutes {
-    rpc RemoteSubscale (SubscaleData) returns (SubspaceTable);
+    rpc RemoteSubscale (RemoteSubscaleRequest) returns (RemoteSubspaceResponse);
 }
 
-message SubscaleData {
-    int64 id = 1;
+message RemoteSubscaleRequest {
+    repeated uint64 labels = 1;
+    uint64 minSignature = 2;
+    uint64 maxSignature = 3;
 }
 
-message SubspaceTable {
+message RemoteSubspaceResponse {
     int64 id = 1;
+
+    // Subspace Table Data
+    repeated uint32 ids = 2;
+    repeated uint32 dimensions = 3;
+
+    int32 tableSize = 4;
+    int32 idsSize = 5;
+    int32 dimensionsSize = 6;
 }
