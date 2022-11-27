@@ -1,4 +1,4 @@
-.PHONY: about init install install-dependencies compile build start generate-protoc
+.PHONY: about init install install-dependencies compile build start generate-protoc clean
 
 VCPKG_DIR := ./include/vcpkg
 VCPKG := ./include/vcpkg/vcpkg
@@ -54,3 +54,9 @@ start-server: ##start subscale
 #
 start-client: ##start subscale
 	./debug/Client/client
+
+##
+# clean
+#
+clean:
+	rm -rf ./debug
