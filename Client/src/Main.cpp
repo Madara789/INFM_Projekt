@@ -1,5 +1,5 @@
-#include <subscale.pb.h>
-#include <subscale.grpc.pb.h>
+#include <generated/subscale.pb.h>
+#include <generated/subscale.grpc.pb.h>
 #include <grpc++/grpc++.h>
 #include <iostream>
 #include <memory>

@@ -1,4 +1,4 @@
-.PHONY: about init install install-dependencies compile build start generate-protoc clean
+.PHONY: about init install install-dependencies compile build start-server start-client clean
 
 VCPKG_DIR := ./include/vcpkg
 VCPKG := ./include/vcpkg/vcpkg
@@ -11,7 +11,7 @@ about:
 # init
 #
 init: ## make sure vcpkg ist cloned as submodule
-	git submodule update --init --recursive && $(VCPKG_DIR)/bootstrap-vcpkg.sh
+	git submodule update --init --recursive && $(VCPKG_DIR)/bootstrap-vcpkg.sh && mkdir Proto/generated
 
 ##
 # install
