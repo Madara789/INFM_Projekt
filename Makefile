@@ -1,4 +1,4 @@
-.PHONY: about init install install-dependencies compile build start-server start-client clean
+.PHONY: about init install install-dependencies compile build start-server start-local-server start-client clean
 
 VCPKG_DIR := ./include/vcpkg
 VCPKG := ./include/vcpkg/vcpkg
@@ -47,7 +47,13 @@ start-subscale: ##start subscale
 # start
 #
 start-server: ##start subscale
-	./debug/Server/server
+	./debug/Server/server $(p)
+
+##
+# start
+#
+start-local-server: ##start subscale
+	./Server/local-server.sh
 
 ##
 # start

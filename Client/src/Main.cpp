@@ -18,6 +18,7 @@
 #include <HelperFunctions/roundingFunctions.h>
 #include <fstream>
 #include <iostream>
+#include "Config.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -106,6 +107,9 @@ int main(int argc, char* argv[])
         maxSignature = labelGenerator->calcMaxSignatureFromVector(labels, points.size(), config->minPoints);
         delete labelGenerator;
 
+        // TODO kann hier config->splittingFactor einfach durch Client::Config::get()->getData()["servers"].size() ersetzt werden ?
+        // for(auto &element : Client::Config::get()->getData()["servers"])
+        //     std::cout << element.get<std::string>() << std::endl;
 
         auto minSigBounds = new unsigned long long[config->splittingFactor];
         auto maxSigBounds = new unsigned long long[config->splittingFactor];

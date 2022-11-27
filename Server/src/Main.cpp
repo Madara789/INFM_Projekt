@@ -38,23 +38,24 @@ public:
     }
 };
 
-void RunServer() {
-    std::string server_address{"localhost:2510"};
+int main(int argc, char* argv[])
+{
+    std::string port;
+    if (argc > 1)
+        port.assign(argv[argc - 1]);
+    else
+        port.assign("2510");
+
+    std::string server_address = "localhost:";
+    server_address.append(port);
     SubscaleRoutesImpl service;
 
-    // Build server
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     std::unique_ptr<Server> server{builder.BuildAndStart()};
 
-    // Run server
     std::cout << "Server listening on " << server_address << std::endl;
     server->Wait();
-}
-
-int main(int argc, char* argv[])
-{
-    RunServer();
     return 0;
 }

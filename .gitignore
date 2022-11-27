@@ -6,6 +6,9 @@
 # GRPC Generated Files
 Proto/generated/
 
+# Override Config
+Client/config.override.json
+
 # User-specific files
 *.rsuser
 *.suo
