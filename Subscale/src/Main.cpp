@@ -147,9 +147,6 @@ int main(int argc, char* argv[])
         printf("Catch: %s\n", e.what());
         return -1;
     }
-    
-
-
   
     return 0;
 }

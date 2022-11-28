@@ -41,7 +41,7 @@ compile: ## compile the code
 # start
 #
 start-subscale: ##start subscale
-	./debug/SubscaleGPU/subscale
+	./debug/Subscale/subscale
 
 ##
 # start

@@ -30,9 +30,9 @@ public:
         {
             response->add_ids(table->getDimensions()[i]);
         }
-        response->set_tablesize(table->getDimensionsSize());
+        response->set_dimensionssize(table->getDimensionsSize());
 
-        response->set_tablesize(table->getTableSize());
+        response->set_tablesize(std::get<1>(result));
 
         return Status::OK;
     }
