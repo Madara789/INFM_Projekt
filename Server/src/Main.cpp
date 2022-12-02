@@ -14,9 +14,13 @@ using subscale::RemoteSubspaceResponse;
 using subscale::SubscaleRoutes;
 
 class SubscaleRoutesImpl final : public SubscaleRoutes::Service {
+private:
+    std::string addr;
 public:
+    SubscaleRoutesImpl(std::string addr) : addr(addr) {};
     Status RemoteSubscale(ServerContext *context, const RemoteSubscaleRequest *request, RemoteSubspaceResponse *response) override
     {
+        std::cout << "server address: " << addr << std::endl;
         auto result = Remote::calculateRemote({std::begin(request->labels()), std::end(request->labels())}, request->minsignature(), request->maxsignature());
         auto table = std::get<0>(result);
         response->set_id(std::get<1>(result));
@@ -48,7 +52,7 @@ int main(int argc, char* argv[])
 
     std::string server_address = "localhost:";
     server_address.append(port);
-    SubscaleRoutesImpl service;
+    SubscaleRoutesImpl service(server_address);
 
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

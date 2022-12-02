@@ -86,9 +86,11 @@ int main(int argc, char* argv[])
         auto servers = Client::Config::get()->getServers();
         std::vector<std::thread> workers;
 
+        // TODO funktioniert so nicht muss irgendwie mit https://github.com/grpc/grpc/blob/master/doc/load-balancing.md gemacht werden
         std::mutex m;
-        for (auto i{ 0 }; i < config->splittingFactor; ++i) {
+        for (auto i{ 0 }; i < 2; ++i) {
             workers.emplace_back(std::thread([&] () {
+                std::cout << servers[i] << std::endl;
                 Client::Client client{grpc::CreateChannel(servers[i], grpc::InsecureChannelCredentials())};
                 auto result = client.remoteCalculation(labels, minSigBounds[i], maxSigBounds[i]);
                 m.lock();
