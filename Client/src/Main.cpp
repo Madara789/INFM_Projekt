@@ -1,8 +1,4 @@
-#include <generated/subscale.pb.h>
-#include <generated/subscale.grpc.pb.h>
-#include <grpc++/grpc++.h>
 #include <iostream>
-#include <memory>
 #include <CsvDataHandler/CsvDataHandler.h>
 #include <SubscaleTypes.h>
 #include <Subscale/Subscale.h>
@@ -14,63 +10,13 @@
 #include <string>
 #include <chrono>
 #include <stdio.h>
-#include <tuple>
 #include <HelperFunctions/roundingFunctions.h>
 #include <fstream>
 #include <iostream>
 #include "Config.h"
-
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::Status;
-using subscale::RemoteSubscaleRequest;
-using subscale::RemoteSubspaceResponse;
-
-class SubscaleClient {
-public:
-    SubscaleClient(std::shared_ptr<Channel> channel): _stub{subscale::SubscaleRoutes::NewStub(channel)} {}
-
-    std::tuple<LocalSubspaceTable*, unsigned int> remoteCalculation(std::vector<unsigned long long> lables, unsigned long long min, unsigned long long max)
-    {
-        RemoteSubscaleRequest request;
-        request.set_minsignature(min);
-        request.set_maxsignature(max);
-
-        for (auto label : lables)
-        {
-            request.add_labels(label);
-        }
-
-        RemoteSubspaceResponse response;
-        ClientContext context;
-        Status status;
-        status = _stub->RemoteSubscale(&context, request, &response);
-
-        if (status.ok())
-        {
-            LocalSubspaceTable* table = new LocalSubspaceTable(response.idssize(), response.dimensionssize(), response.tablesize());
-            for (int i = 0; i < response.idssize(); ++i)
-            {
-                uint32_t id = response.ids(i);
-                table->insertIds(&id, i);
-            }
-
-            for (int i = 0; i < response.dimensionssize(); ++i)
-            {
-                uint32_t dimension = response.dimensions(i);
-                table->insertDimensions(&dimension, i);
-            }
-            std::cout << "OK" << std::endl;
-
-            return std::make_tuple(table, response.id());
-        }
-
-        throw std::runtime_error("GRPC Request Failed");
-    }
-
-private:
-    std::unique_ptr<subscale::SubscaleRoutes::Stub> _stub;
-};
+#include "remote/Client.h"
+#include <thread>
+#include <mutex>
 
 int main(int argc, char* argv[])
 {
@@ -79,6 +25,7 @@ int main(int argc, char* argv[])
         // Read config
         SubscaleConfig* config = new SubscaleConfig();
         config->readJson("SubscaleGPU/Config/config.json");
+        config->splittingFactor = Client::Config::get()->getServers().size();
 
         // Handler for IO operations
         CsvDataHandler* csvHandler = new CsvDataHandler();
@@ -106,10 +53,6 @@ int main(int argc, char* argv[])
         minSignature = labelGenerator->calcMinSignatureFromVector(labels, points.size(), config->minPoints);
         maxSignature = labelGenerator->calcMaxSignatureFromVector(labels, points.size(), config->minPoints);
         delete labelGenerator;
-
-        // TODO kann hier config->splittingFactor einfach durch Client::Config::get()->getData()["servers"].size() ersetzt werden ?
-        // for(auto &element : Client::Config::get()->getData()["servers"])
-        //     std::cout << element.get<std::string>() << std::endl;
 
         auto minSigBounds = new unsigned long long[config->splittingFactor];
         auto maxSigBounds = new unsigned long long[config->splittingFactor];
@@ -140,13 +83,23 @@ int main(int argc, char* argv[])
         auto tables = std::vector<std::tuple<LocalSubspaceTable*, unsigned int>>();
         tables.reserve(config->splittingFactor);
 
-        SubscaleClient client{grpc::CreateChannel({"localhost:2510"}, grpc::InsecureChannelCredentials())};
+        auto servers = Client::Config::get()->getServers();
+        std::vector<std::thread> workers;
+
+        std::mutex m;
         for (auto i{ 0 }; i < config->splittingFactor; ++i) {
-//            auto result = Remote::calculateRemote(labels, minSigBounds[i], maxSigBounds[i]);
-            auto result = client.remoteCalculation(labels, minSigBounds[i], maxSigBounds[i]);
-            tables.push_back(result);
-            std::cout << "Table " << i << std::endl;
+            workers.emplace_back(std::thread([&] () {
+                Client::Client client{grpc::CreateChannel(servers[i], grpc::InsecureChannelCredentials())};
+                auto result = client.remoteCalculation(labels, minSigBounds[i], maxSigBounds[i]);
+                m.lock();
+                tables.push_back(result);
+                m.unlock();
+                std::cout << "Table " << i << std::endl;
+            }));
         }
+
+        for (auto &worker : workers)
+            worker.join();
 
         auto duTableSize = roundToNextPrime(config->denseUnitTableSize);
         auto ssTableSize = roundToNextPrime(config->subspaceTableSize);

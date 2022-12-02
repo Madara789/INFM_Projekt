@@ -22,6 +22,7 @@ namespace Client {
                 auto* f = new std::fstream("Client/config.json");
                 instance->data = nlohmann::json::parse(*f);
             }
+            instance->readJson();
         }
         return instance;
     }
@@ -29,5 +30,10 @@ namespace Client {
     const nlohmann::json &Config::getData() const
     {
         return data;
+    }
+
+    void Config::readJson()
+    {
+        data.at("servers").get_to(servers);
     }
 }

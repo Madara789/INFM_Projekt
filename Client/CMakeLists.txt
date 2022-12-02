@@ -5,6 +5,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 set(SOURCES src/Main.cpp 
             src/Config.h src/Config.cpp
+            src/remote/Client.h src/remote/Client.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

@@ -1,4 +1,4 @@
-.PHONY: about init install install-dependencies compile build start-server start-local-server start-client clean
+.PHONY: about init install install-dependencies compile build start-server start-local-server start-client clean kill-server
 
 VCPKG_DIR := ./include/vcpkg
 VCPKG := ./include/vcpkg/vcpkg
@@ -66,3 +66,9 @@ start-client: ##start subscale
 #
 clean:
 	rm -rf ./debug
+
+##
+# kill-server
+#
+kill-server:
+	killall ./debug/Server/server
