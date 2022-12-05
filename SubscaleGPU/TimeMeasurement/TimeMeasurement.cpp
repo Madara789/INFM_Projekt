@@ -26,12 +26,12 @@ void TimeMeasurement::printTimestampDeltas()
     {
         long delta = timestamp.second - previousTime;
 
-        printf("%s: %d\n", timestamp.first.c_str(), delta);
+        printf("%s: %ld\n", timestamp.first.c_str(), delta);
 
         previousTime = timestamp.second;
     }
 
-    printf("\nFull runtime: %d\n", (timestamps.end() - 1)->second);
+    printf("\nFull runtime: %ld\n", (timestamps.end() - 1)->second);
 }
 
 // Write the time differences between the timestamps to a file
