@@ -30,7 +30,7 @@ add_library(subscale-lib SHARED ${subscaleSRC})
 
 # compilation properties for CUDA
 set_target_properties(subscale-lib PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_ARCHITECTURES 70)
-target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
+# target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
 
 # link libraries (ATTENTION: change the path of mlpack to compile the code)
 target_link_libraries(subscale-lib PUBLIC nlohmann_json nlohmann_json::nlohmann_json)

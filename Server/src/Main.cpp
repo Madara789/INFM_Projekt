@@ -23,6 +23,33 @@ public:
         std::cout << "server address: " << addr << std::endl;
         auto result = Remote::calculateRemote({std::begin(request->labels()), std::end(request->labels())}, request->minsignature(), request->maxsignature());
         auto table = std::get<0>(result);
+        auto numberOfEntries = std::get<1>(result);
+        
+        // auto tablesize = 0;
+
+    /* auto ids = result->getIdsVec(i)
+    auto dimensions = result->getDimensionsVec(i) */
+    // https: // prod.liveshare.vsengsaas.visualstudio.com/join?25C872B39986B581DBDCE84D1555A57400B9
+
+        // For u to number entries
+
+         /* auto ids = result->getIdsVec(i)
+            auto dimensions = result->getDimensionsVec(i) */
+
+            // if ids.size == 0 || dimensions.size == 0 
+                // continue
+
+            // Create entry with ids and dimension 
+            // tablesize ++
+        
+        // set table size 
+
+        // auto idsSize = result->getIdsSize();
+        // auto dimensionSize = table->getDimensionsSize()
+
+        // Setze werte in response 
+
+
         response->set_id(std::get<1>(result));
         for (int i = 0; i < table->getIdsSize(); ++i)
         {

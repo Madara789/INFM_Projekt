@@ -23,3 +23,18 @@ message RemoteSubspaceResponse {
     int32 idsSize = 5;
     int32 dimensionsSize = 6;
 }
+
+message Entry {
+    // Subspace Table Data
+    repeated uint32 ids = 1;
+    repeated uint32 dimensions = 2;
+}
+
+message RemoteSubspaceResponse2 {
+    // Subspace Table Data
+    repeated Entry entries = 1;
+
+    int32 tableSize = 4;
+    int32 idsSize = 5;
+    int32 dimensionsSize = 6;
+}

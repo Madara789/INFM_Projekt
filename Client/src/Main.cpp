@@ -18,17 +18,17 @@
 #include <thread>
 #include <mutex>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     try
     {
         // Read config
-        SubscaleConfig* config = new SubscaleConfig();
+        SubscaleConfig *config = new SubscaleConfig();
         config->readJson("SubscaleGPU/Config/config.json");
         config->splittingFactor = Client::Config::get()->getServers().size();
 
         // Handler for IO operations
-        CsvDataHandler* csvHandler = new CsvDataHandler();
+        CsvDataHandler *csvHandler = new CsvDataHandler();
 
         // Read data points from a csv file
         vector<DataPoint> points;
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
         const int numberOfDimensions = points[0].values.size();
         const int numberOfPoints = points.size();
 
-        LabelGenerator* labelGenerator = new LabelGenerator(1e14, 2e14);
+        LabelGenerator *labelGenerator = new LabelGenerator(1e14, 2e14);
 
         // variables
         auto labels = std::vector<unsigned long long>();
@@ -80,43 +80,56 @@ int main(int argc, char* argv[])
             maxSigBounds[j] = maxSigBoundary;
         }
 
-        auto tables = std::vector<std::tuple<LocalSubspaceTable*, unsigned int>>();
+        auto tables = std::vector<std::tuple<LocalSubspaceTable *, unsigned int>>();
         tables.reserve(config->splittingFactor);
 
         auto servers = Client::Config::get()->getServers();
         std::vector<std::thread> workers;
 
+        /* class Candidates {
+         // Subspace Table Data
+        std::vector<Entry> entries
+
+         int32 tableSize = 4;
+     }
+      */
         std::mutex m;
         grpc::ChannelArguments args;
         args.SetLoadBalancingPolicyName("round_robin");
-        for (auto i{ 0 }; i < config->splittingFactor; ++i) {
-            workers.emplace_back(std::thread([&] () {
+        for (auto i{0}; i < config->splittingFactor; ++i)
+        {
+            workers.emplace_back(std::thread([&]()
+                                             {
                 Client::Client client{grpc::CreateCustomChannel({"ipv4:127.0.0.1:2510,127.0.0.1:2511,127.0.0.1:2512,127.0.0.1:2513,127.0.0.1:2514"}, grpc::InsecureChannelCredentials(), args)};
                 auto result = client.remoteCalculation(labels, minSigBounds[i], maxSigBounds[i]);
                 m.lock();
                 tables.push_back(result);
                 m.unlock();
-                std::cout << "Table " << i << std::endl;
-            }));
+                std::cout << "Table " << i << std::endl; }));
         }
 
         for (auto &worker : workers)
             worker.join();
 
-        auto duTableSize = roundToNextPrime(config->denseUnitTableSize);
+        /* auto duTableSize = roundToNextPrime(config->denseUnitTableSize);
         auto ssTableSize = roundToNextPrime(config->subspaceTableSize);
 
         // local host table for resulting candidates
-        LocalSubspaceTable* resultTable;
+        LocalSubspaceTable *resultTable;
 
-        TableManagerSeq* tableManager = new TableManagerSeq();
+        TableManagerSeq *tableManager = new TableManagerSeq();
 
         // subspace table 4
         auto subspaceTableWrapper = new LocalSubspaceTable(numberOfPoints, numberOfDimensions, ssTableSize);
         auto subspaceJoiner = new SubspaceJoinerSeq(subspaceTableWrapper->getPtr(), ssTableSize);
-        subspaceJoiner->init(0);
+        subspaceJoiner->init(0); */
 
-        for (uint64_t i = 0; i < tables.size(); i++)
+        // Merge response
+        // Condidates 
+        // Füge alle entries hinzu
+        // TotalSize += tableSize 
+        
+        /* for (uint64_t i = 0; i < tables.size(); i++)
         {
             auto tuple = tables[i];
             auto localSubspaceTable = std::get<0>(tuple);
@@ -131,7 +144,7 @@ int main(int argc, char* argv[])
 
         std::cout << numberOfCandidates << std::endl;
 
-        //std::string resultFilePath;
+        // std::string resultFilePath;
 
         if (true)
         {
@@ -144,7 +157,7 @@ int main(int argc, char* argv[])
         {
             //
             // Search cluster candidates for real clusters with the DBSCAN algorithm
-            Clustering* finalClustering = new Clustering(config->minPoints, config->epsilon);
+            Clustering *finalClustering = new Clustering(config->minPoints, config->epsilon);
             std::vector<Cluster> clusters = finalClustering->calculateClusters(points, subspaceTableWrapper, numberOfCandidates);
 
             if (config->saveClusters)
@@ -156,10 +169,10 @@ int main(int argc, char* argv[])
         }
 
         //// Write timestamp differences to an output file
-        //resultFilePath = config->resultPath + "time_Complete.txt";
-        //timer.writeTimestampDeltas(resultFilePath.c_str());
+        // resultFilePath = config->resultPath + "time_Complete.txt";
+        // timer.writeTimestampDeltas(resultFilePath.c_str()); */
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         // Error handling
         printf("Catch: %s\n", e.what());
