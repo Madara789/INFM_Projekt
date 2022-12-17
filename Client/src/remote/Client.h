@@ -8,6 +8,7 @@
 #include <tuple>
 
 using grpc::Channel;
+using subscale::RemoteSubspaceResponse;
 
 namespace Client {
     class Client
@@ -15,7 +16,7 @@ namespace Client {
     public:
         Client(std::shared_ptr<Channel> channel): _stub{subscale::SubscaleRoutes::NewStub(channel)} {}
 
-        std::tuple<LocalSubspaceTable*, unsigned int> remoteCalculation(std::vector<unsigned long long> lables, unsigned long long min, unsigned long long max);
+        RemoteSubspaceResponse remoteCalculation(std::vector<unsigned long long> lables, unsigned long long min, unsigned long long max);
     private:
         std::unique_ptr<subscale::SubscaleRoutes::Stub> _stub;
     };

@@ -12,14 +12,15 @@ message RemoteSubscaleRequest {
     uint64 maxSignature = 3;
 }
 
+message Entry {
+    repeated uint32 ids = 1;
+    repeated uint32 dimensions = 2;
+};
+
 message RemoteSubspaceResponse {
-    int64 id = 1;
-
-    // Subspace Table Data
-    repeated uint32 ids = 2;
-    repeated uint32 dimensions = 3;
-
-    int32 tableSize = 4;
-    int32 idsSize = 5;
-    int32 dimensionsSize = 6;
+    repeated Entry entries = 1;
+    
+    int32 tableSize = 2;
+    int32 idsSize = 3;
+    int32 dimensionsSize = 4;
 }

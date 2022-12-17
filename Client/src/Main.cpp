@@ -17,6 +17,9 @@
 #include "remote/Client.h"
 #include <thread>
 #include <mutex>
+#include <generated/subscale.pb.h>
+
+using subscale::RemoteSubspaceResponse;
 
 int main(int argc, char* argv[])
 {
@@ -80,7 +83,7 @@ int main(int argc, char* argv[])
             maxSigBounds[j] = maxSigBoundary;
         }
 
-        auto tables = std::vector<std::tuple<LocalSubspaceTable*, unsigned int>>();
+        auto tables = std::vector<RemoteSubspaceResponse>();
         tables.reserve(config->splittingFactor);
 
         auto servers = Client::Config::get()->getServers();
@@ -97,7 +100,8 @@ int main(int argc, char* argv[])
         std::mutex m;
         grpc::ChannelArguments args;
         args.SetLoadBalancingPolicyName("round_robin");
-        for (auto i{ 0 }; i < config->splittingFactor; ++i) {
+        for (auto i{ 0 }; i < config->splittingFactor; ++i) 
+        {
             workers.emplace_back(std::thread([&] () {
                 Client::Client client{grpc::CreateCustomChannel(addr, grpc::InsecureChannelCredentials(), args)};
                 auto result = client.remoteCalculation(labels, minSigBounds[i], maxSigBounds[i]);
@@ -126,12 +130,13 @@ int main(int argc, char* argv[])
 
         for (uint64_t i = 0; i < tables.size(); i++)
         {
-            auto tuple = tables[i];
-            auto localSubspaceTable = std::get<0>(tuple);
-            auto numberOfEntries = std::get<1>(tuple);
+            // TODO anpassen an neue Struktur
+            // auto tuple = tables[i];
+            // auto localSubspaceTable = std::get<0>(tuple);
+            // auto numberOfEntries = std::get<1>(tuple);
 
-            subspaceJoiner->join(localSubspaceTable, numberOfEntries);
-            delete localSubspaceTable;
+            // subspaceJoiner->join(localSubspaceTable, numberOfEntries);
+            // delete localSubspaceTable;
         }
 
         // count number of candidates
