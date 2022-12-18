@@ -10,25 +10,29 @@
 #include "../SubscaleConfig/SubscaleConfig.h"
 #include "ISubscale.h"
 
-
-
 // Parallel subscale implementation
 class Subscale : public ISubscale
 {
 private:
-
-    LocalSubspaceTable* calculateCandidates(
-        vector<vector<CoreSet>> coreSets, 
-        CsvDataHandler* csvHandler,
-        unsigned long long* labels,
+    LocalSubspaceTable *calculateCandidates(
+        vector<vector<CoreSet>> coreSets,
+        CsvDataHandler *csvHandler,
+        unsigned long long *labels,
         int numberOfDimensions,
         int numberOfPoints,
-        unsigned long long minSignature, 
+        unsigned long long minSignature,
         unsigned long long maxSignature);
 
+    std::tuple<LocalSubspaceTable *, unsigned int> calculateSlice(
+        vector<vector<CoreSet>> coreSets,
+        std::vector<unsigned long long> &labels,
+        int numberOfDimensions,
+        int numberOfPoints,
+        unsigned long long minSigBound,
+        unsigned long long maxSigBound);
 
 public:
-    Subscale(SubscaleConfig* config) : ISubscale(config)
-    {}
+    Subscale(SubscaleConfig *config) : ISubscale(config)
+    {
+    }
 };
-

@@ -80,8 +80,5 @@ public:
 
     LocalSubspaceTable* calculateClusterCandidates(vector<DataPoint> points);
 
-    virtual LocalSubspaceTable* getResultTable(CsvDataHandler* csvHandler, int numberOfDimensions,
-        int numberOfPoints) = 0;
-
     std::tuple<LocalSubspaceTable*, unsigned int> calculateClusterCandidatesRemote(std::vector<unsigned long long>& lables, unsigned long long min, unsigned long long max);
 };

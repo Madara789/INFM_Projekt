@@ -3,7 +3,7 @@
     "epsilon": 0.02,
     "splittingFactor": 5,
     "dataPath": "SubscaleGPU/data/sample5.csv",
-    "resultPath": "results/",
+    "resultPath": "/home/matth/master/projekt/INFM_Projekt/",
     "saveCandidates": false,
     "useDBSCAN": true,
     "saveClusters": true,
