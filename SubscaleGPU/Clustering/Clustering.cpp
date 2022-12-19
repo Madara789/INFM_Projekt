@@ -14,7 +14,7 @@ Clustering::Clustering(int minPoints, double epsilon)
 
 std::vector<Cluster> Clustering::calculateClusters(vector<DataPoint> points, std::map<int, SubscaleEntry*>* candidates) {
 
-	dbscan::DBSCAN<> dbs(epsilon, minPoints);
+	DBSCAN<> dbs(epsilon, minPoints);
 	arma::mat data;
 
 	vector<Cluster> clusters;
