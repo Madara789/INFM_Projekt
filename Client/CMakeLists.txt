@@ -16,6 +16,7 @@ target_include_directories(client PRIVATE ../SubscaleGPU ../Proto)
 target_link_libraries(client PRIVATE myproto subscale-lib gRPC::grpc++ nlohmann_json nlohmann_json::nlohmann_json)
 
 FILE(COPY config.json DESTINATION ${CMAKE_BINARY_DIR}/Client)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Client/results)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config.override.json)
     message("Override Config Exists")

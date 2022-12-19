@@ -29,10 +29,8 @@ file(GLOB subscaleSRC
 
 add_library(subscale-lib SHARED ${subscaleSRC})
 
-# compilation properties for CUDA
 set_target_properties(subscale-lib PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_ARCHITECTURES 70)
-# TODO muss glaub wieder hinzugefügt werden
-# target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
+target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
 
 target_include_directories(subscale-lib PRIVATE ${MLPACK_INCLUDE_DIRS})
 
