@@ -35,7 +35,4 @@ private:
 public:
     SubscaleSeq(SubscaleConfig* config) : ISubscale(config)
     {}
-
-    LocalSubspaceTable* getResultTable(CsvDataHandler* csvHandler, int numberOfDimensions,
-        int numberOfPoints);
 };

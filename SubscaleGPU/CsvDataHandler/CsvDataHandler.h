@@ -7,6 +7,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <algorithm>
+#include <map>
+#include "../entry/SubscaleEntry.h"
 
 #include "../Tables/SubspaceTable.cuh"
 
@@ -24,6 +26,7 @@ public:
 	void writeTable(const char* path, SubscaleTable* table, unsigned int numberOfEntries);
 	void writeTable(const char* path, SubscaleTable* table);
 	void writeVecTable(const char* path, SubspaceTable* table, unsigned int numberOfEntries);
+	void writeCandidates(const char* path, std::map<int, SubscaleEntry*>* candidates);
 
 	void writeClusters(const char* path, vector<Cluster> clusters);
 

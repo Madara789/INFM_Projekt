@@ -55,6 +55,69 @@ vector<DataPoint> CsvDataHandler::read(const char* path, char delimiter)
 	return points;
 }
 
+// writes a subspace table to a file at the given path and converts bitmaps to vectors
+void CsvDataHandler::writeCandidates(const char* path, std::map<int, SubscaleEntry*>* candidates)
+{
+	// Create an output filestream object
+	std::ofstream myFile(path);
+
+	unsigned int bufferIndex = 0;
+	int len;
+
+	for (const auto& kv : *candidates)
+	{
+		auto entry = kv.second;
+
+		auto dimensionsVec = entry->getDimensions();
+		auto idsVec = entry->getIds();
+
+		if (dimensionsVec.size() == 0 || idsVec.size() == 0)
+			continue;
+
+		buffer[bufferIndex++] = '[';
+
+		// Dimensions
+		for (int j = 0; j < dimensionsVec.size() - 1; j++)
+		{
+			len = sprintf(buffer + bufferIndex, "%u", dimensionsVec[j]);
+			bufferIndex += len;
+			buffer[bufferIndex++] = ',';
+		}
+
+		// last dimension value (isn't followed by a comma)
+		len = sprintf(buffer + bufferIndex, "%u", dimensionsVec[dimensionsVec.size() - 1]);
+		bufferIndex += len;
+
+		// closing bracket for dimensions and opening bracket for ids
+		buffer[bufferIndex++] = ']';
+		buffer[bufferIndex++] = '-';
+		buffer[bufferIndex++] = '[';
+
+
+		// IDs
+		for (int j = 0; j < idsVec.size() - 1; j++)
+		{
+			len = sprintf(buffer + bufferIndex, "%u", idsVec[j]);
+			bufferIndex += len;
+			buffer[bufferIndex++] = ',';
+		}
+
+		// last id value (isn't followed by a comma)
+		len = sprintf(buffer + bufferIndex, "%u", idsVec[idsVec.size() - 1]);
+		bufferIndex += len;
+
+		// closing bracket for ids and start new line
+		buffer[bufferIndex++] = ']';
+		buffer[bufferIndex++] = '\n';
+
+	}
+
+	myFile.write(buffer, bufferIndex);
+
+	// Close the file
+	myFile.close();
+}
+
 // writes a subscale table to a file at the given path
 void CsvDataHandler::writeTable(const char* path, SubscaleTable* table, unsigned int numberOfEntries)
 {

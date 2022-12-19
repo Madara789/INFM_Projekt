@@ -7,7 +7,17 @@ std::tuple<LocalSubspaceTable*, unsigned int> Remote::calculateRemote(std::vecto
 	config->readJson("SubscaleGPU/Config/config.json");
 
 	// Calculate cluster candidates with the SUBSCALE algorithm
-	ISubscale* subscale = new SubscaleSeq(config);
+	ISubscale* subscale;
+
+	if (config->runSequential) 
+	{
+		subscale = new SubscaleSeq(config);
+	}
+	else
+	{
+		subscale = new Subscale(config);
+	}
+
 
 	return subscale->calculateClusterCandidatesRemote(lables, min, max);
 }

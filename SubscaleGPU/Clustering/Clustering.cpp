@@ -12,6 +12,69 @@ Clustering::Clustering(int minPoints, double epsilon)
 	this->epsilon = epsilon;
 }
 
+std::vector<Cluster> Clustering::calculateClusters(vector<DataPoint> points, std::map<int, SubscaleEntry*>* candidates) {
+
+	DBSCAN<> dbs(epsilon, minPoints);
+	arma::mat data;
+
+	vector<Cluster> clusters;
+
+	// iterate over all entries in the table
+	for (const auto& kv : *candidates) 
+	{
+		auto entry = kv.second;
+
+		auto dimensions = entry->getDimensions();
+		auto ids = entry->getIds();
+
+		if (dimensions.size() == 0 || ids.size() == 0)
+			continue;
+
+		data.set_size(dimensions.size(), ids.size());
+
+		for (int j = 0; j < ids.size(); j++)
+		{
+			for (int k = 0; k < dimensions.size(); k++)
+			{
+				data(k, j) = points[ids[j]].values[dimensions[k]];
+			}
+		}
+
+		//
+		// clustering
+		arma::mat centroids;
+		arma::Row<size_t> assignements;
+
+		int numClusters = dbs.Cluster(data, assignements, centroids);
+
+		// check number of found clusters
+		if (numClusters > 0)
+		{
+			//
+			// convert cluster to a Cluster struct
+			vector<vector<unsigned int>> pointsInClusters;
+			pointsInClusters.resize(numClusters);
+
+			for (int j = 0; j < ids.size(); j++)
+			{
+				if (assignements[j] != -1)
+				{
+					pointsInClusters[assignements[j]].push_back(ids[j]);
+				}
+			}
+
+			for (std::vector<unsigned int> pointsInCluster : pointsInClusters)
+			{
+				Cluster cluster = { dimensions, pointsInCluster };
+				clusters.push_back(cluster);
+			}
+		}
+		delete entry;
+	}
+
+	return clusters;
+}
+
 // find clusters in the given cluster candidates
 vector<Cluster> Clustering::calculateClusters(vector<DataPoint> points, LocalSubspaceTable* clusterCandidates)
 {

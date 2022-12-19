@@ -99,52 +99,6 @@ LocalSubspaceTable* SubscaleSeq::calculateCandidates(
 	return resultTable;
 }
 
-LocalSubspaceTable* SubscaleSeq::getResultTable(CsvDataHandler* csvHandler, int numberOfDimensions,
-	int numberOfPoints) {
-	TableManagerSeq* tableManager = new TableManagerSeq();
-
-	// subspace table 1
-	localSubspaceTable = new LocalSubspaceTable(numberOfPoints, numberOfDimensions, condensedSsTableSize);
-
-	// local host table for resulting candidates
-	LocalSubspaceTable* resultTable;
-	auto numberOfEntries = 0;
-
-	if (config->splittingFactor > 1)
-	{
-		// if splitting factor is larger than 1, slices have to be read from the filesystem
-		ssTableSize = roundToNextPrime(config->finalTableSize);
-
-		// subspace table 4
-		subspaceTableWrapper = new LocalSubspaceTable(numberOfPoints, numberOfDimensions, ssTableSize);
-		auto subspaceJoiner = new SubspaceJoinerSeq(subspaceTableWrapper->getPtr(), ssTableSize);
-		subspaceJoiner->init(0);
-
-		//
-		// combine slices
-		auto numberOfEntries = combineAllSlices(subspaceJoiner, csvHandler, tableManager);
-
-		// subspace table 5
-		delete condensedSsTableWrapper;
-		condensedSsTableWrapper = new LocalSubspaceTable(numberOfPoints, numberOfDimensions, numberOfEntries);
-
-		tableManager->condenseTable(condensedSsTableWrapper->getPtr(), subspaceTableWrapper->getPtr(), ssTableSize);
-		delete subspaceJoiner;
-		delete subspaceTableWrapper;
-
-	}
-
-	// subspace table 6
-	resultTable = new LocalSubspaceTable(numberOfPoints, numberOfDimensions, numberOfEntries);
-	tableManager->localToLocal(resultTable, condensedSsTableWrapper->getPtr(), numberOfEntries);
-
-	// free memory
-	delete condensedSsTableWrapper;
-	delete tableManager;
-
-	return resultTable;
-}
-
 std::tuple<LocalSubspaceTable*, unsigned int> SubscaleSeq::calculateSlice(
 	vector<vector<CoreSet>> coreSets,
 	std::vector<unsigned long long>& labels,
@@ -202,6 +156,29 @@ std::tuple<LocalSubspaceTable*, unsigned int> SubscaleSeq::calculateSlice(
 
 		// copy table to local memory
 		tableManager->deviceToLocal(localSubspaceTable, condensedSsTableWrapper->getPtr(), numberOfEntries);
+	}
+
+	if (denseUnitTableWrapper != nullptr) {
+		delete denseUnitTableWrapper;
+	}
+
+	if (subspaceTableWrapper != nullptr) {
+		delete subspaceTableWrapper;
+	}
+
+	if (denseUnitCreator != nullptr) {
+		delete denseUnitCreator;
+	}
+
+	if (subspaceJoiner != nullptr) {
+		delete subspaceJoiner;
+	}
+
+	if (tableManager != nullptr) {
+		delete tableManager;
+	}
+	if (labelsArray != nullptr) {
+		delete[] labelsArray;
 	}
 
 	return { localSubspaceTable, numberOfEntries };
