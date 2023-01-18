@@ -1,7 +1,5 @@
 FROM nvcr.io/nvidia/cuda:12.0.0-devel-ubuntu20.04
 
-ENV LD_LIBRARY_PATH /usr/local/cuda/lib64/stubs/:$LD_LIBRARY_PATH
-
 WORKDIR /subscale
 
 RUN apt update
