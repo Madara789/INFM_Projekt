@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_TOOLCHAIN_FILE include/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 set(GCC_COVERAGE_COMPILE_FLAGS "-fopenmp")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem /usr/local/cuda/include ${GCC_COVERAGE_COMPILE_FLAGS}")
 set(VCPKG_TARGET_TRIPLET x64-linux)
 
 include(include/vcpkg/scripts/buildsystems/vcpkg.cmake)

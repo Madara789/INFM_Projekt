@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.16)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 find_path(MLPACK_INCLUDE_DIRS "mlpack/mlpack.hpp")
@@ -30,7 +30,7 @@ file(GLOB subscaleSRC
 add_library(subscale-lib SHARED ${subscaleSRC})
 
 set_target_properties(subscale-lib PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_ARCHITECTURES 70)
-target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
+# target_compile_options(subscale-lib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>: --relocatable-device-code=true>)
 
 target_include_directories(subscale-lib PRIVATE ${MLPACK_INCLUDE_DIRS})
 
