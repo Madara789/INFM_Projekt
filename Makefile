@@ -12,10 +12,11 @@ about:
 	@echo "     - compile: compile the code"
 	@echo "     - start-subscale: start subscale local"
 	@echo "     - start-server: starts a server to which the client sends data to calculate"
-	@echo "						default port is 8080, else set with -p=<port-number>"
+	@echo "                     default port is 8080, else set with -p=<port-number>"
 	@echo "     - start-client: starts execution subscale distributed"
-	@echo "		- kill-server: kills all servers still running in background"
-	@echo "		- removes builded files"
+	@echo "     - kill-server: kills all servers still running in background"
+	@echo "     - removes builded files"
+
 
 init:
 	git submodule update --init --recursive && $(VCPKG_DIR)/bootstrap-vcpkg.sh && mkdir Proto/generated
