@@ -24,10 +24,6 @@ make build  // builds cmake changes
 make compile    // compiles the code 
 ```
 
-### Visual Studio
-
-will be added soon
-
 ## Configuration
 When the application is started, the path to a config file has to be passed as a command line argument. The config file allows the user to specify various parameters for the application. The file `config.json` is an example for a config file. 
 
@@ -38,12 +34,33 @@ A parameter that currently can't be altered inside of a config file, is the maxi
 To start the calculation, the following make instruction can be made.
 
 ```
-make start-subscale // executes the code in sequentiell // parallel on one machine
+make start-subscale
 ```
 
 For the distributed execution there are some additional make instructions.
 
 ```
-make start-server // starts the server for distributed execution
-make start-client // starts the client for distributed execution
+make start-server
+make start-client
 ```
+
+There is also the possibility to start via docker. Therefor first build the container from the container wher the Dockerfile is located.
+
+```
+docker build -t subscale .
+```
+
+Then just run with the wanted port.
+
+```
+docker run --name subscaleGPUServer --gpus all --rm -it -p 8080:8080 subscale make start-server p=8080
+```
+
+For the client just configure the `config.json` and then start calculation with the following.
+
+```
+docker run --name subscaleGPUClient --gpus all --rm -it subscale /bin/bash
+make start-client
+```
+
+Then the result will be found in Clients result folder.

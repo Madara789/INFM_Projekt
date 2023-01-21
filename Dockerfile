@@ -12,5 +12,3 @@ RUN make init
 RUN make install-dependencies
 RUN make build
 RUN make compile
-
-EXPOSE 8080

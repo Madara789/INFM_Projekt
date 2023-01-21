@@ -10,9 +10,9 @@ int main(int argc, char* argv[])
     if (argc > 1)
         port.assign(argv[argc - 1]);
     else
-        port.assign("2510");
+        port.assign("8080");
 
-    std::string server_address = "localhost:";
+    std::string server_address = "0.0.0.0:";
     server_address.append(port);
     Server::SubscaleRoutesImpl service(server_address);
 

@@ -105,17 +105,19 @@ int main(int argc, char *argv[])
             std::mutex m;
             grpc::ChannelArguments args;
             args.SetLoadBalancingPolicyName("round_robin");
+            args.SetMaxReceiveMessageSize(9999999);
             for (auto i{0}; i < config->splittingFactor; ++i)
             {
                 workers.emplace_back(std::thread([&](int index)
-                                                 {
+                {
                 Client::Client client{grpc::CreateCustomChannel(addr, grpc::InsecureChannelCredentials(), args)};
                 auto result = client.remoteCalculation(labels, minSigBounds[index], maxSigBounds[index]);
                 m.lock();
                 tables.push_back(result);
                 m.unlock();
-                std::cout << "Table " << index << std::endl; },
-                                                 i));
+                std::cout << "Table " << index << std::endl; 
+                },
+                i));
             }
 
             for (auto &worker : workers)
