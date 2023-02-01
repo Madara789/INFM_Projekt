@@ -1,0 +1,75 @@
+\section{Benchmarking}
+
+Für das Benchmarking wurde von jedem Teammitglied jeweils ein Docker-Container mit Server gestartet. Anschließend wurde auf einem der Cluster-Rechner der Client gestartet und die Ausführung gemessen. Das bedeutet, dass die gesamte Ausführungszeit des Clients das Messergebnis ergibt. Bei der sequentiellen Messung wird ebenfalls innerhalb des Containers der Subscale-Algorithmus gestartet, jedoch nicht die verteilte Version.
+
+\subsection{Sequentiell}
+
+Die sequentielle Berechnung innerhalb eines Containers ergab die folgende Ausführungszeit.
+
+\begin{center}
+    \begin{tabular}{ |c|c| }
+        \hline
+        Ausführungsmessung & Zeit    \\
+        \hline
+        1                  & 2.685 s \\
+        2                  & 2.659 s \\
+        3                  & 2.675 s \\
+        4                  & 2.681 s \\
+        5                  & 2.711 s \\
+        6                  & 2.657 s \\
+        7                  & 2.679 s \\
+        8                  & 2.662 s \\
+        9                  & 2.667 s \\
+        10                 & 2.676 s \\
+        \hline
+        Durchschnitt       & 2.675 s \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Hierbei ist auffällig, dass sich alle Messungen sehr nahe beieinander Befinden und davon auszugehen ist, dass der gemessene Wert eine gute Basis für einen Vergleich darstellt.
+
+\subsection{Verteilt}
+
+Bei der verteilten Berechnung über mehrere Container und Rechner hinweg ergaben sich folgende Messungen.
+
+\begin{center}
+    \begin{tabular}{ |c|c| }
+        \hline
+        Ausführungsmessung & Zeit     \\
+        \hline
+        1                  & 10.736 s \\
+        2                  & 11.285 s \\
+        3                  & 10.982 s \\
+        4                  & 10.924 s \\
+        5                  & 10.859 s \\
+        6                  & 10.908 s \\
+        7                  & 11.753 s \\
+        8                  & 11.813 s \\
+        9                  & 11.348 s \\
+        10                 & 11.633 s \\
+        \hline
+        Durchschnitt       & 11.224 s \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Hier gibt es Abweichungen um bis zu einer Sekunde. Eine mögliche Quelle dieser Abweichungen besteht darin, dass das Netzwerk nicht immer gleich auf Anfrage und Antwort reagieren kann, was auf die nicht alleinige Nutzung dieses Netzwerks zurückzuführen ist.
+
+\subsection{Vergleich}
+
+Bei dem Vergleich der durchschnittlichen Laufzeit ist zu erkennen, dass der verteilte Algorithmus langsamer ist als der Sequentielle. In der folgenden Tabelle nochmal die langsamste und schnellste Messung, als auch der Durchschnitt aller Messungen gegenübergestellt.
+
+\begin{center}
+    \begin{tabular}{ |c|c|c| }
+        \hline
+        Typ                        & Sequentiell & Verteilt \\
+        \hline
+        langsamste Messung         & 2.711 s     & 11.813 s \\
+        schnellste Messung         & 2.657 s     & 10.736 s \\
+        duschschnitt der Messungen & 2.675 s     & 11.224 s \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Die Vermutung liegt nahe, dass der uns zur Verfügung gestellten Testdatensatz nur bedingt für eine effizientere Ausführung durch eine Verteilung geeignet ist, da dieser dafür potenziell zu klein ist. Bei einem Datensatz, welcher noch sehr viel mehr Daten enthält, könnte sich der Overhead, welcher durch den Netzwerkverkehr entsteht, im Verhältnis zu dem lokalen Berechnen wieder lohnen. Jedoch muss dies in einem folgenden Versuch überprüft werden, wenn auch solch ein Datensatz zur Verfügung steht.

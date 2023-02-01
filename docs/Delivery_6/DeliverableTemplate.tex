@@ -5,10 +5,54 @@
 %%% Um einen Artikel auf deutsch zu schreiben, genügt es die Klasse ohne
 %%% Parameter zu laden.
 \documentclass[]{lni}
-%%% To write an article in English, please use the option ``english'' in order
-%%% to get the correct hyphenation patterns and terms.
-%%% \documentclass[english]{class}
-%%
+\usepackage{graphicx}
+\usepackage{dirtree}
+\usepackage{listings}
+\graphicspath{{./Bilder/}}
+
+% Farben definieren
+\definecolor{linkblue}{RGB}{0, 0, 100}
+\definecolor{linkblack}{RGB}{0, 0, 0}
+\definecolor{comment}{RGB}{63, 127, 95}
+\definecolor{darkgreen}{RGB}{14, 144, 102}
+\definecolor{darkblue}{RGB}{0,0,168}
+\definecolor{darkred}{RGB}{128,0,0}
+\definecolor{javadoccomment}{RGB}{0,0,240}
+\definecolor{Gray}{RGB}{242,242,242}
+
+
+% Einstellungen für Quelltexte
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+
+\lstset{
+      xleftmargin=0.1cm,
+      basicstyle=\footnotesize\ttfamily,
+      keywordstyle=\color{darkgreen},
+      identifierstyle=\color{darkblue},
+      commentstyle=\color{comment},
+      stringstyle=\color{darkred},
+      tabsize=2,
+      lineskip={2pt},
+      columns=flexible,
+      inputencoding=utf8,
+      captionpos=b,
+      backgroundcolor=\color{backcolour},   
+      breakautoindent=true,
+	  breakindent=2em,
+	  breaklines=true,
+	  prebreak=,
+	  postbreak=,
+      numbers=left,                    
+      numbersep=5pt,  
+      numberstyle=\tiny\color{codegray},  
+      showspaces=false,      % Keine Leerzeichensymbole
+      showtabs=false,        % Keine Tabsymbole
+      showstringspaces=false,% Leerzeichen in Strings
+      morecomment=[s][\color{javadoccomment}]{/**}{*/},
+      literate={Ö}{{\"O}}1 {Ä}{{\"A}}1 {Ü}{{\"U}}1 {ß}{{\ss}}2 {ü}{{\"u}}1 {ä}{{\"a}}1 {ö}{{\"o}}1
+}
+
 \begin{document}
 %%% Mehrere Autoren werden durch \and voneinander getrennt.
 %%% Die Fußnote enthält die Adresse sowie eine E-Mail-Adresse.
@@ -24,7 +68,7 @@
         Deutschland \email{wmendat@stud-hs.offenburg.de}} \and
     Matthias Reichenbach\footnote{Hochschule Offenburg, Offenburg,
         Deutschland \email{mreichen@stud-hs.offenburg.de}}}
-    \startpage{11} % Beginn der Seitenzählung für diesen Beitrag / Start page
+    \startpage{1} % Beginn der Seitenzählung für diesen Beitrag / Start page
     \editor{Team Subscale} % Names of Editors
     \booktitle{Subscale Algorythmus} % Name of book title
     \yearofpublication{2022}
@@ -39,6 +83,7 @@
     \input{Chapter/Chapter_4.tex}
     \input{Chapter/Chapter_5.tex}
     \input{Chapter/Chapter_6.tex}
+    \input{Chapter/Chapter_7.tex}
 
 %%% Angabe der .bib-Datei (ohne Endung) / State .bib file (for BibTeX usage)
 \bibliography{Literatur}

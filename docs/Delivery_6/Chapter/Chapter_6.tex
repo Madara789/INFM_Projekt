@@ -1,3 +1,79 @@
-\section{Überschrift/Heading}
+\section{Cluster}
 
-Hallo \cite{XX14}
+Für das Testen der neu implementierten Verteilung wird das Projekt auf einem Cluster ausgeführt. Dazu werden von der Hochschule einige Rechner zur Verfügung gestellt.
+
+\subsection{Zugriff}
+
+Um generell auf das Cluster zugreifen zu können, werden n Personen benötigt. Dies liegt daran, dass das Cluster über bwLehrPool-Remot erreichbar ist. Ein anderes Cluster konnte uns zu dem Zeitpunkt nicht zur Verfügung gestellt werden. Da wir genug Personen im Team waren, um eine einigermaßen aussagekräftige Anzahl von Rechnern bereitstellen zu können, war dies für uns kein Problem. Jeder der n Personen meldet sich dann auf einem der Rechner in dem IMLA Pool an. Dort können dann die Container, welche später genauer erläutert werden, gestartet werden. Da diese alle in einem Netzwerk verfügbar sind, entsteht keine Schwierigkeit eine Verbindung zwischen den Rechnern des Pools herzustellen.
+
+\subsection{Dockerfile}
+
+Um ein Server oder Client auf einem Cluster-Rechner zu starten, wird dieser innerhalb eines Docker-Containers gestartet. Dieser Gedanke entstand aufgrund der Gegebenheiten, dass nicht immer alle benötigten Tools auf einem System installiert sind. Durch das Benutzen eines Docker-Containers können auf diesen, sofern für diesen alle benötigten Tools installiert sind, zum Beispiel die \verb|nvidia-container-runtime|, alle noch nicht vorhandenden aber benötigten Tools nachinstalliert werden. In dem folgenden Listing \ref{code:Dockerfile} ist dieser Ansatz zu erkennen.
+
+\begin{lstlisting}[caption=Dockerfile, label={code:Dockerfile}, captionpos=b]
+    FROM nvcr.io/nvidia/cuda:12.0.0-devel-ubuntu20.04
+
+    WORKDIR /subscale
+    
+    RUN apt update
+    RUN DEBIAN_FRONTEND=nointeractive TZ=Etc/UTC apt install -y --allow-unauthenticated --no-install-recommends tzdata
+    RUN apt install -y --allow-unauthenticated --no-install-recommends git curl zip unzip tar pkg-config gfortran python3 cmake nano
+    
+    COPY . .
+    
+    RUN make init
+    RUN make install-dependencies
+    RUN make build
+    RUN make compile
+
+\end{lstlisting}
+
+CUDA-Images gibt es in drei Varianten und sind über das öffentliche NVIDIA Hub Repository verfügbar.
+
+\begin{itemize}
+    \item base: enthält ab CUDA 9.0 das absolute Minimum (libcudart) für den Einsatz einer vorgefertigten CUDA Anwendung.
+    \item runtime: erweitert das Basis-Image um alle gemeinsam genutzten Bibliotheken des CUDA-Toolkits.
+    \item devel: erweitert das Runtime-Image, indem es die Compiler-Toolchain, die Debugging-Tools, die Header und die statischen Bibliotheken hinzufügt.
+\end{itemize}
+
+Um bereits ein System zu haben, welches mit CUDA kompatibel ist, wurde sich für die \verb|devel|-Version entschieden. Dabei wurde auch die neuste Version benutzt. Schlussendlich ist in Zeile 1 das verwendete Docker-CUDA-Image ``nvcr.io/nvidia/cuda:12.0.0-devel-ubuntu20.04'', für welches sich entschieden wurde, zu sehen. Aufgrund einer Empfehlung von Prof. Dr.-Ing. Janis Keuper wird der Container direkt von NVIDIA genommen und nicht von Docker Hub.
+
+Leider ist auch auf dem CUDA-Image nicht alles installiert, was benötigt wird, um das Projekt zu kompilieren. Aus diesem Grund werden von Zeile 5 bis Zeile 7 alle notwendigen Tools installiert. Dabei gab es vor allem die Schwierigkeit, \verb|cmake| zu installieren. Als Lösung dafür musste, getrennt von allem, der Befehl in Zeile 5 \verb|RUN apt update| und anschließend in Zeile 6 \verb|tzdata| installiert werden. Dies ermöglicht die Umgehung des manuellen Setzten der Zeitzone, welche beim normalen Installieren von \verb|cmake| auftritt. Auch war es notwendig, das \verb|DEBIAN_FRONTEND| auf \verb|nointeractice| zu setzen.
+
+In Zeile 9 ist durch \verb|COPY . .| der Befehl zu erkennen, welcher das Projekt in den Container kopiert. Anschließend werden von Zeile 11 bis 14 die normalen Befehle, welche benötigt werden, um den Code zu kompilieren, ausgeführt. Dafür wird das zuvor beschriebene Makefile verwendet, was an dieser Stelle eine sehr große Vereinfachung darstellt.
+
+In dem Dockerfile wird kein \verb|EXPOSE| festgelegt, um die spätere Containererstellung zu vereinfachen. Falls man auf einem Rechner testweise mehrere Container starten möchte, sollten nicht dieselben Ports exposed werden. Auch kann so sehr einfach automatisiert werden, welcher Container mit welchem Port laufen soll. Im späteren Verlauf des Dokuments wird aufgezeigt, wie der Port bei dem \verb|docker run|-Befehl freigegeben wird.
+
+\subsection{Docker-Ausführung}
+
+Um den Container mit allen Konfigurationen zu bauen, wird das oben genannte Dockerfile verwendet. Dabei wird mit dem Befehl
+
+\begin{itemize}
+    \item[] \verb|docker build -t subscale .|
+\end{itemize}
+
+der Container gebaut. Der Befehl wird in demselben Verzeichnis wie das Dockerfile ausgeführt. Dies kann einige Zeit in Anspruch nehmen, da dabei zuerst der Container heruntergeladen (falls noch nicht bereits geschehen) wird sowie das gesamte Projekt und auch Sub-Module kompiliert werden. Vor allem das \verb|mlpack| scheint eine sehr zeitaufwendige Kompilierung zu haben. Anschließend kann mit dem Befehl
+
+\begin{itemize}
+    \item[] \verb|docker run --name subscaleGPUServer --gpus all --rm -it -p 8080:8080|
+    \item[] \verb|subscale make start-server p=8080|
+\end{itemize}
+
+der Container gestartet werden. Durch die Namensgebung mit \verb|--name| ist im anschließenden Schritt die Handhabung mit dem laufenden Container einfacher. Auch muss mit \verb|--gpus all| der Zugriff auf GPU-Ressourcen ermöglicht werden. Die Flag \verb|--rm| ist optional, aber empfohlen, da dies nach Beenden des Containers diesen automatisch entfernt. Anzumerken ist, dass dabei nicht das Image, welches durch den \verb|docker build| Befehl entstanden ist, gelöscht wird. Durch \verb|-p 8080:8080| wird der Port 8080 des Containers auf 8080 nach außen gemappt. Dann kann dieser Port dem \verb|make start-server| als \verb|p=8080| übergeben werden, woraufhin dieser direkt mit dem Port 8080 gestartet wird. Durch die Flag \verb|-it| bekommt man die Sicht auf den Server, wodurch zu erkennen ist, ob ein Request des Clients ankam oder nicht.
+
+Den Client, welcher die Berechnung startet, sollte nun über den folgenden Befehl ausgeführt werden.
+
+\begin{itemize}
+    \item[] \verb|docker run --name subscaleGPUClient --gpus all --rm -it|
+    \item[] \verb|subscale /bin/bash|
+\end{itemize}
+
+Dadurch wird eine Konsole innerhalb des Containers geöffnet. Auch hier ist die Nutzung von \verb|-it| sinnvoll. Dies liegt vor allem daran, dass dort auch das Ergebnis gespeichert wird. Anschließend kann durch \verb|make start-client| der Prozess gestartet werden. Dafür muss natürlich die \verb|Client/config.json| richtig angepasst sein.
+
+Generell erhält man die IP-Adresse eines laufenden Containers über den folgenden Befehl.
+
+\begin{itemize}
+    \item[] \verb|docker container inspect subscaleGPUServer || \verb| grep -i IPAddress|
+\end{itemize}
+
+Hierbei wird sichtbar, dass die Namensgebung den Vorteil bietet, nicht erst die ID des Containers herausfinden zu müssen. So ist es auch an dieser Stelle einfacher, eine Automatisierung zu ermöglichen.
