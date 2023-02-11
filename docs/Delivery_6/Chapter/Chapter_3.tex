@@ -1,96 +1,86 @@
-\section{Buildsystem}
-\label{sec:buildsystem}
-Damit der Entwickelte Code getestet werden kann, muss dieser vernünftig mit allen Notwendigen Libraries und Abhängigkeiten kompiliert werden. Hierfür musste das vorhandene Buildsystem überarbeitet und angepasst werden, damit neue Änderungen getestet werden können. Zusätzlich muss der Code auf neuen Systemen schnell lauffähig sein, ohne viele einzelne Abhängigkeiten einzeln zu installieren.
+\section{Analyse der vorhandenen Implementierung}
+Zur Verfügung steht eine Java- sowie eine C-Implementierung des Algorithmus. Die Implementierung in C wurde näher betrachtet, da diese die Möglichkeit bietet, Algorithmusschritte mithilfe der Grafikkarte zu beschleunigen.
 
-\subsection{CMAKE}
-\label{sec:cmake}
-Wie schon bereits einleitend in Kapitel \ref{sec:buildsystem} erläutert, muss das Buildsystem angepasst werden. Hierfür wurden die CMAKE Files angepasst, sowie die Struktur des Codes. Der Vorgegebene Code nutzt Absolute Pfade für die Abhängigkeiten, dies erschwert das Zusammenarbeiten und aufsetzten des Codes. Das gesamte Buildsystem musste angepasst werden, damit beim Aufsetzten des Repositories nicht noch Pfade in den CMAKE-Dateien angepasst werden müssen. Dafür wurde der package manager VCPKG, als GIT-Submodule zum Repository hinzugefügt. Dadurch wird beim Herunterladen des Repositories auch der package manager mit Installiert und in der CMAKE-Datei kann ein Relativer Pfad angegeben werden. Damit VCPKG installiert wird und die benötigten Abhängigkeiten installiert werden, wurde zusätzlich eine Makefile hinzugefügt. Mittels dieser kann VCPKG durch einen Make-Befehl installiert werden und durch einen Zweiten Make-Befehl alle Abhängigkeiten (nlohmann-json, mlpack, gRPC) installiert. Durch das verwenden des VCPKG package manager können die Abhängigkeiten durch die CMAKE-Befehle \textit{find\_package} und \textit{find\_path} eingebunden werden und es benötigt keine Anpassungen der Pfade.
+\subsection{Aufbau des Programmes}
+Das Programm lässt sich mit einer JSON-Konfigurationsdatei, welche im ersten Schritt eingelesen und deserialisiert wird, parametrisieren. Hier werden beispielsweise Algorithmushyperparameter wie \tau und \epsilon bestimmt oder die Berechnung über die Grafikkarte aktiviert bzw. deaktiviert.\\
+Der Datensatz wird als CSV-Datei bereitgestellt, welche in einen Vektor mit Elementen einer internen Datenstruktur „DataPoint“ umgewandelt wird. DataPoint ist hier irreführend, da die Datenstruktur eine Dimension und die Werte dieser Dimension aller Datensätze hält.\\
+Mit Nutzung des Strategy-Patterns wird abhängig der Konfiguration die sequenzielle oder die parallele Subscale Strategie geladen.\\
+Die Methode „calculateClusterCandidates“, die beide Strategien zur Verfügung stellen, durchläuft den eingangs beschriebenen Algorithmus und liefert die Subspaces des übergebenen Datensatzes. Aus den Subspaces werden im Anschluss Cluster mittels DBSCAN ermittelt. Die gefundenen Cluster werden in einer CSV-Datei persistiert.
 
-\subsection{Makefile}
+\subsection{Sequenzielle Implementierung}
+Die sequenzielle Strategie instanziiert factory-ähnlich Abarbeitungsklassen, welche als Referenz an die generische Methode „calculateAllSlices“ übergeben werden.\\
+Die Methode unterteilt den Gesamtraum in disjunkte Teilräume. Für jeden Teilraum werden sequenziell die Dense Units bestimmt, gefiltert und zu Subspaces geclustert um diese Zwischenergebnisse anschließend pro Slice in einer eigenen CSV-Datei abspeichern zu können.\\
+Im Anschluss werden die Dateien mit Zwischenergebnissen Datei für Datei zu einem Endergebnis kombiniert. Das Gesamtergebnis wird dem DBSCAN-Algorithmus übergeben. Die finalen Cluster werden in eine Datei geschrieben.
 
-Um das Projekt zu kompilieren, mussten manuell viele Parameter manuell angepasst werden. Zum Beispiel musste der Pfad zum \verb|vcpkg| in einem CMakeLists-File angepasst werden. Um solche umständlichen und nicht ganz trivialen Schritte zu vereinfachen, wurde das Makefile erstellt. Dieses ist in Listing \ref{code:Makefile} dargestellt.\\
+\subsection{GPU-beschleunigte Implementierung}
+Die GPU beschleunigte Implementierung unterscheidet sich von der sequenziellen Implementierung bei der Instanziierung der Abarbeitungsklassen. „DenseUnitCreator“ und „SubspaceJoiner“ ersetzen die CPU basierten Berechnungen durch Berechnungen auf der Grafikkarte.\\
+Das Zusammenführe der Teilergebnisse erfolgt mit der identischen Logik wie im sequenziellen Algorithmus.
 
-\begin{lstlisting}[caption=Makefile, label={code:Makefile}, captionpos=b]
-    .PHONY: about init install-dependencies build compile start-subscale start-server start-client kill-server clean
+\section{Restrukturierung in einer neuen Anwendung}
+Mit einer architektonischen Umstrukturierung sollen verschiedene Phasen des Algorithmus beliebig austauschbar werden, sodass verschiedene Verteil- und Beschleunigungsverfahren miteinander verglichen werden können.\\
+Subscale lässt sich in die Phasen Import, CoreSet-Seeker, DenseUnit-Generation, Subspace-Detection, Subspace-Combination und Export unterteilen. Jede der Phasen wird mit einem Interface abstrahiert. Für ein Proof of Conecpt soll der Subscale Algorithmus in einer sequenziellen Ausführung mit der Neustrukturierung implementiert werden.
 
-    VCPKG_DIR := ./include/vcpkg
-    VCPKG := ./include/vcpkg/vcpkg
-    
-    about:
-	    @echo "Makefile to help manage subscale gpu project"
-	    @echo "commands:"
-	    @echo "     - init: make sure vcpkg ist cloned as submodule"
-	    @echo "     - install-dependencies: install all vcpkg dependencies"
-	    @echo "     - build: build cmake changes"
-	    @echo "     - compile: compile the code"
-	    @echo "     - start-subscale: start subscale local"
-	    @echo "     - start-server: starts a server to which the client sends data to   calculate"
-	    @echo "                     default port is 8080, else set with     -p=<port-number>"
-	    @echo "     - start-client: starts execution subscale distributed"
-	    @echo "     - kill-server: kills all servers still running in background"
-	    @echo "     - removes builded files"
-    
-    init:
-        git submodule update --init --recursive && $(VCPKG_DIR)/bootstrap-vcpkg.sh && mkdir Proto/generated
-    
-    install-dependencies:
-        $(VCPKG) install nlohmann-json && $(VCPKG) install mlpack && $(VCPKG) install grpc
-    
-    build:
-        cmake -S . -B ./debug
-    
-    compile:
-        cmake --build ./debug
-    
-    start-subscale:
-        ./debug/Subscale/subscale
-    
-    start-server:
-        ./debug/Server/server $(p)
-    
-    start-client:
-        ./debug/Client/client
-    
-    kill-server:
-        killall ./debug/Server/server
-    
-    clean:
-        rm -rf ./debug
-\end{lstlisting}
+\subsection{Import}
+Die Importer implementieren eine Methode, die Tensordaten aus einem Medium auslesen und diese als Kollektion der Datenstruktur „Dimension“ bereitstellen. Die Dimension hält ihre Größe, sowie ein Set von Punkten.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/Importer.png}
+	\caption{ImporterInterface}
+\end{figure}
+Für das Projekt konkret implementiert wurde ein CsvImporter, welcher die Daten aus einer CSV-Datei ausließt und in Dimensions zur weiteren Verarbeitung umwandelt.\\
+Der Datenimport kann hier mit weiteren konkreten Implementierungen beliebig ergänzt oder ersetzt werden. Denkbar wäre beispielsweise der Import anderer Datenformate wie JSON oder XML oder das Lesen von entfernt bereitgestellten Ressource wie beispielsweise eine CSV-Datei auf einem SFTP-Server.
 
-Durch die Verwendung dieser Makefile-Befehle soll es vereinfacht werden, den Code zum einen manuell in seiner eignen Umgebung ausführen zu können, als auch zum anderen automatisiert innerhalb eines Docker-Containers.
+\subsection{CoreSet-Seeker}
+Der CoreSet-Seeker iteriert durch die übergebene Dimension und liefert für diese alle gefundenen CoreSets.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/CoreSetSeeker.png}
+	\caption{CoreSetSeekerInterface}
+\end{figure}
+Konkret implementiert wurde ein SequentialCoreSetGenerator. Dieser iteriert mit zwei geschachtelten for-Schleifen über alle Punkte der übergebenen Dimension und berechnet hiermit die euklidische Distanz zwischen allen Punkten. Unterschreitet diese \epsilon, werden die Punkte zu einem CoreSet zusammengefasst.\\
+Weiter denkbar wäre die Implementierungen ParallelCoreSetGenerator, welcher die CoreSets auf einer GPU berechnen lässt, indem mehreren Threads unterschiedliche Dimensionen oder gar einzelne Punkte einer Dimension zugewiesen werden. Die Resultate werden im Anschluss gesammelt und zusammengeführt.\\
+Auch eine Implementierung DistributeCoreSetGenerator könnte den Algorithmus beschleunigen. Diese Implementierung dekoriert eine der vorherigen Implementierungen, indem diese den Aufruf mittels GRPC an entfernte Maschinen weiterleitet, auf dessen Berechnungsergebnisse wartet um diese dann zusammengeführt zurückgeben zu können.
 
-Da das \verb|vcpkg| als Submodule integriert wurde, was die automatisierte Installation und Pfadfindung von \verb|vcpkg| als auch \verb|gRPC|, \verb|mlpack| und \verb|nlohmann-json| ermöglicht, können alle benötigten Schritte per \verb|make init| (Zeilen 20f) und \verb|make install-dependencies| (Zeilen 23f) sehr einfach und automatisiert installiert und integriert werden. Es besteht weiterhin die Möglichkeit in den CMakeLists-Files dies manuell anzupassen und diese beiden Makefile-Befehle zu ignorieren. Dies ist sinnvoll, wenn man Docker-Container besitzt, welche dies im Vorhinein bereits installiert haben oder man das \verb|vckpg| aus seiner eigenen Entwicklungsumgebung nutzen möchte.
+\subsection{Dense Unit Generator}
+Der Dense Unit Generator erstellt für jedes CoreSet alle Kombinationen der Größe \tau. Diese Kombinationen werden in der Datenstruktur DenseUnit abgelegt. DenseUnits werden gesammelt und als Collection zurückgegeben.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/DenseUnitGenerator.png}
+	\caption{DenseUnitGeneratorInterface}
+\end{figure}
+Die Implementierung SequentialDenseUnitGenerator übernimmt genau dies in for-Schleifen. Zukünftige Implementierungen ParallelDenseUnitGenerator und DistributedDenseUnitGenerator parallelisieren die Generierung der Dense Units zum Beispiel durch Zuweisung eines CoreSets pro Thread und verteilen diese.
 
-Um das Projekt an sich über CMAKE zu bauen, wird dies durch \verb|make build| (Zeilen 26f) vereinfacht. Das Kompilieren des Codes wird auch durch das Makefile unterstützt. Dazu kann mit \verb|make compile| (Zeilen 29f) der Code kompiliert werden.
+\subsection{Subspace Detector}
+Der Subspace Detector untersucht Dense Units auf Kollisionen und findet dadurch Subspaces: Anhäufungen vom Punkten über mehrere Dimensionen.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/SubspaceDetector.png}
+	\caption{SubspaceDetectorInterface}
+\end{figure}
+Der SequentialSubspaceDetector iteriert über alle DenseUnits und prüft deren Signatur auf Kollision mit anderen DenseUnits. Kollidieren mehrere Dense Units, bilden diese einen Subspace. Die Methode gibt alle entdeckten Subspaces zurück.\\
+Ein ParallelSubspaceDetector und ein DistributedSubspaceDetector könnten die gleiche Aufgabe durch Verteilen der zu untersuchenden DenseUnits auf Threads und durch Verteilen auf entfernte Maschinen und anschließendes Zusammenführen erledigen.
 
-Wenn man den Subscale-Algorithmus starten möchte, bietet das Makefile ebenfalls Möglichkeiten, dies vereinfacht zu tun. So kann mit \verb|make start-subscale| (Zeilen 32f) die lokale Ausführung auf einem Rechner gestartet werden. Über \verb|make start-server| (Zeilen 35f) beziehungsweise \verb|make start-client| (Zeilen 38f) kann der Server beziehungsweise Client für die verteilte Ausführung gestartet werden. Wenn man den Server startet, hat man die Möglichkeit den Port, über welchen dieser gestartet werden soll, zu setzten. So kann man mit \verb|make start-server -p=8080| sagen, dass der Server auf den Port 8080 hören soll.
+\subsection{Subspace Combiner}
+Der Subspace Combiner erstellt aus den Subspaces, welche mehrere Dense Units bündeln, Cluster.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/SubspaceCombiner.png}
+	\caption{SubspaceCombinerInterface}
+\end{figure}
+Der SequentialSubspaceCombiner iteriert über alle Punkte der im Subspace vorkommenden Dense Units und eliminiert Duplikate beim Zusammenfassen zu Cluster. Dies geschieht durch Iteration über alle Subspaces, deren Dense Units und den dort enthaltenen Punkten.\\
+Der Bau der Cluster funktioniert für jeden Subspace unabhängig, weswegen die Subspacekombination in einem ParallelSubspaceCombiner und einem DistributedSubspaceCombiner parallelisiert und verteilt werden kann.
 
-Falls man einen Server richtig beenden möchte, weil dieser aus unerklärlichen Gründen weiterhin im Hintergrund läuft, kann man dies auch über den Befehl \verb|make kill-server| tun und erspart sich die manuelle PID-Findung.
+\subsection{Factory}
+Die Definition der Schnittstellen erlaubt eine beliebige Konfiguration des Algorithmus. Eine Subscale Klasse wird mit der Übergabe eines CoreSetSeekers, eines DenseUnitGenerators, eines SubspaceDetectors und eines SubspaceCombiners instanziiert. Deren Methode „getClusters“ nimmt ein Set von Dimensionen, iteriert über diese um mit dem CoreSetSeeker alle CoreSets zu erhalten, bildet aus den CoreSets Dense Units, in welchen anschließend Subspaces gesucht werden, die die Methode schlussendlich zu Cluster kombiniert. DBSCAN übernimmt das finale Clustering der durch Subscale gefundenen Clusterkandidaten.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{./Bilder/Restrukturierung/Factory.png}
+	\caption{Factory}
+\end{figure}
+Da diese Architektur dem Open-Close-Principle folgt, bietet sie die Möglichkeit, dass mehrere Entwickler zeitgleich und konfliktfrei verschiedene Module entwickeln können. Außerdem erlaubt sie eine feingranulare Analyse über Optimierungsoptionen. So kann der Algorithmus beispielsweise aus einen verteilten CoreSetSeeker, einem parallelen DenseUnitGenerator, einem sequenziellen SubspaceDetector und einem parallelen SubspaceCombiner bestehen. Für beliebige Kombinationen kann die Ausführungszeit gemessen werden, um zu analysieren, bei welchen Prozessschritten durch die Parallelisierung und Verteilung tatsächlich ein Zeitgewinn zu verzeichnen ist.
 
-Zuletzt kann auch alles, was durch das Projekt gebaut wurde, wieder mit \verb|make clean| (Zeilen 44f) entfernt werden.
-
-\subsection{Umstrukturierung}
-Der Vorgegebene Code war nicht dafür ausgelegt diesen zu verteilen, deshalb muss die Struktur angepasst werden. Dies ist vor allem auch notwendig damit unabhängig voneinander gearbeitet werden kann ohne das Merge-Konflikte entstehen. Der Vorgegebene Code hatte folgende Struktur:
-\dirtree{%
-.1 data.
-.1 packages.
-.1 SubscaleGPU.
-.2 ....
-.1 CMakeLists.txt.
-.1 config.json.
-}
-Der Komplette Subscale-Algorithmus befand sich in dem Ordner \textit{SubscaleGPU}, die dazugehörigen Daten in dem \textit{data} Ordner. Zusätzlich benötigte Libraries befanden sich im \textit{packages} Ordner. Die Aktuelle Struktur erschwerte das hinzufügen einer Client-Server-Architektur. Der Code muss umstrukturiert werden, damit gleichzeitig an Client, Server und dem Subscale-Algorithmus gearbeitet werden kann. Der Komplette Subscale Algorithmus wurde in einen eigenen Ordner verschoben und als Statische Library weiterentwickelt, somit kann dieser einfach im Client und Server eingebunden werden. Des Weiteren benötigt sowohl Client als auch Server die Protobuf-Dateien, dafür wurden die .proto-Dateien in einen eigenen Ordner gelegt und von Client und Server verwendet zum Entwickeln der Schnittstellen. Die daraus entstandene Struktur sieht folgendermaßen aus:
-
-\dirtree{%
-.1 Client.
-.1 include.
-.2 vcpkg.
-.1 Proto.
-.2 subscale.proto.
-.1 Server.
-.1 SubscaleGPU.
-.2 data.
-.2 Config.
-.1 CMakeLists.txt.
-}
+\subsection{Probleme}
+Da parallel die Anpassung der Codevorlage analysiert wurde, entschieden wir uns für ein „Proof of Concept“. Nach dessen Umsetzung wollen wir abwägen, welche Lösung für die Projektumsetzung herangezogen wird.\\
+Das Proof of Concept umfasste die dargelegte Architektur und die konkrete Implementierung für die sequenzielle Abarbeitung des Algorithmus. Der SequentialCoreSetSeeker, der SequentialDenseUnitGenerator, der SequentialSubspaceDetector und der SequentialSubspaceCombiner wurden implementiert und in einer SequentialSubscaleFactory kombiniert. Ebenfalls implementiert wurde ein CSV-Importer zum Einlesen des Testdatensatzen.\\
+Für kleine Datensätze war die Umsetzung lauffähig und lieferte Ergebnisse. Allerdings war die Laufzeit um ein Vielfaches länger. Größere Datensätze konnten aufgrund eines Speicherüberlaufs nicht bearbeitet werden. Bei der Implementierung wurde das von C++ benötigte akribische Speichermanagement zu sehr vernachlässigt was die Performanz der Anwendung massiv einschränkte.\\
+Des Weiteren entschieden wir uns nach der PoC-Phase gegen die Fortsetzung dieser Lösung, da die Cuda-Codeabschnitte aus der Codevorlage nicht einfach übernommen werden konnten. Für Anpassungen im Cuda-Code fehlt im Team die Expertise. Eine parallele Umsetzung ist folglich nicht möglich.
