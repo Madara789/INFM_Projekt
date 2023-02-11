@@ -2,7 +2,7 @@
 Zur Verfügung steht eine Java- sowie eine C-Implementierung des Algorithmus. Die Implementierung in C wurde näher betrachtet, da diese die Möglichkeit bietet, Algorithmusschritte mithilfe der Grafikkarte zu beschleunigen.
 
 \subsection{Aufbau des Programmes}
-Das Programm lässt sich mit einer JSON-Konfigurationsdatei, welche im ersten Schritt eingelesen und deserialisiert wird, parametrisieren. Hier werden beispielsweise Algorithmushyperparameter wie \tau und \epsilon bestimmt oder die Berechnung über die Grafikkarte aktiviert bzw. deaktiviert.\\
+Das Programm lässt sich mit einer JSON-Konfigurationsdatei, welche im ersten Schritt eingelesen und deserialisiert wird, parametrisieren. Hier werden beispielsweise Algorithmushyperparameter wie $\tau$ und $\epsilon$ bestimmt oder die Berechnung über die Grafikkarte aktiviert bzw. deaktiviert.\\
 Der Datensatz wird als CSV-Datei bereitgestellt, welche in einen Vektor mit Elementen einer internen Datenstruktur „DataPoint“ umgewandelt wird. DataPoint ist hier irreführend, da die Datenstruktur eine Dimension und die Werte dieser Dimension aller Datensätze hält.\\
 Mit Nutzung des Strategy-Patterns wird abhängig der Konfiguration die sequenzielle oder die parallele Subscale Strategie geladen.\\
 Die Methode „calculateClusterCandidates“, die beide Strategien zur Verfügung stellen, durchläuft den eingangs beschriebenen Algorithmus und liefert die Subspaces des übergebenen Datensatzes. Aus den Subspaces werden im Anschluss Cluster mittels DBSCAN ermittelt. Die gefundenen Cluster werden in einer CSV-Datei persistiert.
@@ -37,12 +37,12 @@ Der CoreSet-Seeker iteriert durch die übergebene Dimension und liefert für die
 	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/CoreSetSeeker.png}
 	\caption{CoreSetSeekerInterface}
 \end{figure}
-Konkret implementiert wurde ein SequentialCoreSetGenerator. Dieser iteriert mit zwei geschachtelten for-Schleifen über alle Punkte der übergebenen Dimension und berechnet hiermit die euklidische Distanz zwischen allen Punkten. Unterschreitet diese \epsilon, werden die Punkte zu einem CoreSet zusammengefasst.\\
+Konkret implementiert wurde ein SequentialCoreSetGenerator. Dieser iteriert mit zwei geschachtelten for-Schleifen über alle Punkte der übergebenen Dimension und berechnet hiermit die euklidische Distanz zwischen allen Punkten. Unterschreitet diese $\epsilon$, werden die Punkte zu einem CoreSet zusammengefasst.\\
 Weiter denkbar wäre die Implementierungen ParallelCoreSetGenerator, welcher die CoreSets auf einer GPU berechnen lässt, indem mehreren Threads unterschiedliche Dimensionen oder gar einzelne Punkte einer Dimension zugewiesen werden. Die Resultate werden im Anschluss gesammelt und zusammengeführt.\\
 Auch eine Implementierung DistributeCoreSetGenerator könnte den Algorithmus beschleunigen. Diese Implementierung dekoriert eine der vorherigen Implementierungen, indem diese den Aufruf mittels GRPC an entfernte Maschinen weiterleitet, auf dessen Berechnungsergebnisse wartet um diese dann zusammengeführt zurückgeben zu können.
 
 \subsection{Dense Unit Generator}
-Der Dense Unit Generator erstellt für jedes CoreSet alle Kombinationen der Größe \tau. Diese Kombinationen werden in der Datenstruktur DenseUnit abgelegt. DenseUnits werden gesammelt und als Collection zurückgegeben.
+Der Dense Unit Generator erstellt für jedes CoreSet alle Kombinationen der Größe $\tau$. Diese Kombinationen werden in der Datenstruktur DenseUnit abgelegt. DenseUnits werden gesammelt und als Collection zurückgegeben.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.5\textwidth]{./Bilder/Restrukturierung/DenseUnitGenerator.png}

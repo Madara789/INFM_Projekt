@@ -1,5 +1,5 @@
 \section{Analyse des Algorithmus}
-Clustering-Algorithmen suchen in vieldimensionalen Räumen nach Gruppen von Einträgen mit ähnlichen Eigenschaften. Hierbei werden die Eigenschaften eines Datensatzes, im Folgenden „Features“ genannt, als numerischer Vektor repräsentiert und mit denen anderer Datensätze mit einem geeigneten Distanzmaß verglichen. Die Hyperparameter \tau und \epsilon bestimmen, wann es sich bei ähnlichen Datensätzen um ein Cluster handelt. \epsilon ist die Maximaldistanz, welche zwei Datensätze haben dürfen, um ähnlich zu sein. \tau bestimmt die Minimalgröße eines Clusters. Ein Cluster besteht folglich aus mindestens \tau Datensätzen, welche einen Maximalabstand von \epsilon zueinander haben.\\
+Clustering-Algorithmen suchen in vieldimensionalen Räumen nach Gruppen von Einträgen mit ähnlichen Eigenschaften. Hierbei werden die Eigenschaften eines Datensatzes, im Folgenden \glqq Features\grqq genannt, als numerischer Vektor repräsentiert und mit denen anderer Datensätze mit einem geeigneten Distanzmaß verglichen. Die Hyperparameter $\tau$ und $\epsilon$ bestimmen, wann es sich bei ähnlichen Datensätzen um ein Cluster handelt. $\epsilon$ ist die Maximaldistanz, welche zwei Datensätze haben dürfen, um ähnlich zu sein. $\tau$ bestimmt die Minimalgröße eines Clusters. Ein Cluster besteht folglich aus mindestens $\tau$ Datensätzen, welche einen Maximalabstand von $\epsilon$ zueinander haben.\\
 Der Subscale-Algorithmus unterscheidet sich von gängigen Clustering-Algorithmen dadurch, dass er Teilräume der Datensätze miteinander vergleicht. Diese speicherintensive Methode gliedert sich in sieben Schritte, welche sich jeweils parallelisieren und verteilen 
 lassen.
 
@@ -8,10 +8,10 @@ Initial wird jedes Datum mit einer hohen zufälligen Ganzzahl markiert. Dieser S
 welcher dann als Vergleichselement genutzt werden kann.
 
 \subsection{Core-Set Erzeugung}
-Zunächst wird jede Dimension isoliert betrachtet. Das bedeutet, das ein bestimmtes Feature eines jeden Datensatzes mit dem gleichen Feature der anderen Datensätze mit einem geeigneten Distanzmaß verglichen wird. Sind sich mindestens \tau Datensätze \epsilon nahe oder näher, bilden diese Datensätze ein Core-Set. Die Core-Sets sind eindimensionale Cluster und werden für jede Dimension ermittelt.
+Zunächst wird jede Dimension isoliert betrachtet. Das bedeutet, das ein bestimmtes Feature eines jeden Datensatzes mit dem gleichen Feature der anderen Datensätze mit einem geeigneten Distanzmaß verglichen wird. Sind sich mindestens $\tau$ Datensätze $\epsilon$ nahe oder näher, bilden diese Datensätze ein Core-Set. Die Core-Sets sind eindimensionale Cluster und werden für jede Dimension ermittelt.
 
 \subsection{Kombination zu Dense Units}
-Die Core-Sets werden weiter prozessiert. Jegliche mögliche Kombination aus Punkten eines Core-Sets mit der Größe \tau bilden eine Dense Unit. Dense Units werden für jedes Core-Set in jeder Dimension kombiniert.
+Die Core-Sets werden weiter prozessiert. Jegliche mögliche Kombination aus Punkten eines Core-Sets mit der Größe $\tau$ bilden eine Dense Unit. Dense Units werden für jedes Core-Set in jeder Dimension kombiniert.
 
 \subsection{Dense Unit Kollision}
 In diesem Schritt werden die Dense Units einer Dimension mit deren anderer Dimensionen verglichen. Der Vergleich geschieht mittels des initial zugewiesenen Schlüssels. Die Summe der Schlüssel aller Features einer Dense Unit bildet die Signatur der Dense Unit. Diese Signatur ist aufgrund der hohen Schlüsselwerte mit hoher Wahrscheinlichkeit eindeutig. Durch den Vergleich von Dense Unit Signaturen kann somit effizient ermittelt werden, ob die gleiche Dense Unit in unterschiedlichen Dimensionen existiert. Dense Unit Paare werden mit den Dimensionen, in welchen sie vorkommen, gelabelt.
