@@ -44,3 +44,6 @@ kill-server:
 
 clean:
 	rm -rf ./debug
+
+start-local-server:
+	./Server/local-server.sh

@@ -94,29 +94,20 @@ int main(int argc, char *argv[])
             auto servers = Client::Config::get()->getServers();
             std::vector<std::thread> workers;
 
-            std::string addr = "ipv4:";
-            for (size_t i = 0; i < servers.size() - 1; i++)
-            {
-                addr.append(servers[i]);
-                addr.append(",");
-            }
-            addr.append(servers[servers.size() - 1]);
-
             std::mutex m;
             grpc::ChannelArguments args;
-            args.SetLoadBalancingPolicyName("round_robin");
             args.SetMaxReceiveMessageSize(9999999);
             for (auto i{0}; i < config->splittingFactor; ++i)
             {
                 workers.emplace_back(std::thread([&](int index)
                 {
-                Client::Client client{grpc::CreateCustomChannel(addr, grpc::InsecureChannelCredentials(), args)};
-                auto result = client.remoteCalculation(labels, minSigBounds[index], maxSigBounds[index]);
-                m.lock();
-                tables.push_back(result);
-                m.unlock();
-                std::cout << "Table " << index << std::endl; 
-                },
+                    Client::Client client{grpc::CreateCustomChannel(servers[index], grpc::InsecureChannelCredentials(), args)};
+                    auto result = client.remoteCalculation(labels, minSigBounds[index], maxSigBounds[index]);
+                    m.lock();
+                    tables.push_back(result);
+                    m.unlock();
+                    std::cout << "Table " << index << std::endl; 
+                    },
                 i));
             }
 
