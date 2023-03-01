@@ -1,12 +1,26 @@
 \section{Anpassung der existierenden Lösung}
-Infrastrukturelle Anpassungen wurden im Buildsystem vorgenommen. Herausfordernd war das initiale Setup des bestehenden Projekts, da hierfür die Installation von externen Abhängigkeiten notwendig ist. Außerdem müssen Dateistrukturänderugen in der Builddatei von CMAKE reflektiert werden. Um die zukünftige Installation auf weiteren Systemen zu vereinfachen, wurde das Buildtool CMAKE angepasst und das Projekt zur Befehlsaggregation mit einer Makefile ergänzt.
+Infrastrukturelle Anpassungen wurden im Buildsystem vorgenommen. Herausfordernd war das initiale Setup des bestehenden
+Projekts, da hierfür die Installation von externen Abhängigkeiten notwendig ist. Außerdem müssen Dateistrukturänderugen
+in der Builddatei von CMAKE reflektiert werden. Um die zukünftige Installation auf weiteren Systemen zu vereinfachen,
+wurde das Buildtool CMAKE angepasst und das Projekt zur Befehlsaggregation mit einer Makefile ergänzt.
+
 
 \subsection{CMAKE}
 \label{sec:cmake}
-Wie schon bereits einleitend in Kapitel \ref{sec:buildsystem} erläutert, muss das Buildsystem angepasst werden. Hierfür wurden die CMAKE Files angepasst, sowie die Struktur des Codes. Der vorgegebene Code nutzt absolute Pfade für die Abhängigkeiten. Dies erschwert das Zusammenarbeiten und Aufsetzten des Codes. Das gesamte Buildsystem musste angepasst werden, damit beim Aufsetzten des Repositories nicht noch Pfade in den CMAKE-Dateien angepasst werden müssen. Dafür wurde der package manager VCPKG, als GIT-Submodule zum Repository hinzugefügt. Dadurch wird beim Herunterladen des Repositories auch der package manager mit Installiert und in der CMAKE-Datei kann ein Relativer Pfad angegeben werden. Damit VCPKG installiert wird und die benötigten Abhängigkeiten installiert werden, wurde zusätzlich eine Makefile hinzugefügt. Mittels dieser kann VCPKG durch einen Make-Befehl installiert werden und durch einen Zweiten Make-Befehl alle Abhängigkeiten (nlohmann-json, mlpack, gRPC) installiert. Durch das verwenden des VCPKG package manager können die Abhängigkeiten durch die CMAKE-Befehle \textit{find\_package} und \textit{find\_path} eingebunden werden und es benötigt keine Anpassungen der Pfade.
+Absolute Pfadreferenzen in der bestehenden Implementierung erschwerten die gemeinsame Arbeit und den Build an einer
+Codebasis, weswegen die CMAKE-Files und die Struktur des Codes angepasst wurde. Um das Setup des Projekts zu
+vereinfachen wurde der Paketmanager VCPKG als GIT-Submodule zum Repository hinzugefügt. Mit dem Clone des Repositories
+wird dann auch der Paketmanager installiert, welcher die Referenzierung von Abhängigkeiten mit relativen Pfaden
+ermöglicht. Durch das verwenden des VCPKG package manager können die Abhängigkeiten durch die CMAKE-Befehle
+\textit{find\_package} und \textit{find\_path} eingebunden werden. Eine manuelle Anpassung der Pfade ist dann nicht mehr
+notwendig.\\
+
 
 \subsection{Makefile}
-Um das Projekt zu kompilieren, mussten manuell viele Parameter manuell angepasst werden. Zum Beispiel musste der Pfad zum \verb|vcpkg| in einem CMakeLists-File angepasst werden. Um solche umständlichen und nicht ganz trivialen Schritte zu vereinfachen, wurde das Makefile erstellt. Dieses ist in Listing \ref{code:Makefile} dargestellt.\\
+Eine definierte Makefile bietet die Möglichkeit zur Ausführung von Befehlssequenzen über einfache Aggregatsbefehle.
+So kann der Paketmanager selbst und alle eingebundenen Abhängigkeiten mit zwei Befehlen installiert werden.
+Die Kompilierung des Projektes ist ebenfalls mit einem Makebefehl möglich, sodass vorher nötige manuelle Anpassungen nun
+osolet sind. Dies ist in Listing \ref{code:Makefile} dargestellt.\\
 
 \begin{lstlisting}[caption=Makefile, label={code:Makefile}, captionpos=b]
     .PHONY: about init install-dependencies build compile start-subscale start-server start-client kill-server clean
@@ -56,20 +70,31 @@ Um das Projekt zu kompilieren, mussten manuell viele Parameter manuell angepasst
         rm -rf ./debug
 \end{lstlisting}
 
-Durch die Verwendung dieser Makefile-Befehle soll es vereinfacht werden, den Code zum einen manuell in seiner eignen Umgebung ausführen zu können, als auch zum anderen automatisiert innerhalb eines Docker-Containers.
+Durch die Verwendung dieser Makefile-Befehle soll es vereinfacht werden, den Code zum einen manuell in seiner eignen
+Umgebung ausführen zu können, als auch zum anderen automatisiert innerhalb eines Docker-Containers.
 
-Da das \verb|vcpkg| als Submodule integriert wurde, was die automatisierte Installation und Pfadfindung von \verb|vcpkg| als auch \verb|gRPC|, \verb|mlpack| und \verb|nlohmann-json| ermöglicht, können alle benötigten Schritte per \verb|make init| (Zeilen 20f) und \verb|make install-dependencies| (Zeilen 23f) sehr einfach und automatisiert installiert und integriert werden. Es besteht weiterhin die Möglichkeit in den CMakeLists-Files dies manuell anzupassen und diese beiden Makefile-Befehle zu ignorieren. Dies ist sinnvoll, wenn man Docker-Container besitzt, welche dies im Vorhinein bereits installiert haben oder man das \verb|vckpg| aus seiner eigenen Entwicklungsumgebung nutzen möchte.
+Da das \verb|vcpkg| als Submodule integriert wurde, was die automatisierte Installation und Pfadfindung von \verb|vcpkg|
+als auch \verb|gRPC|, \verb|mlpack| und \verb|nlohmann-json| ermöglicht, können alle benötigten Schritte per
+\verb|make init| (Zeilen 20f) und \verb|make install-dependencies| (Zeilen 23f) sehr einfach und automatisiert
+installiert und integriert werden. Es besteht weiterhin die Möglichkeit die CMakeLists-Files manuell anzupassen und
+diese beiden Makefile-Befehle zu ignorieren. Dies ist sinnvoll, wenn man Docker-Container besitzt, welche dies im
+Vorhinein bereits installiert haben oder das \verb|vckpg| aus der eigenen Entwicklungsumgebung genutzt werden soll.
 
-Um das Projekt an sich über CMAKE zu bauen, wird dies durch \verb|make build| (Zeilen 26f) vereinfacht. Das Kompilieren des Codes wird auch durch das Makefile unterstützt. Dazu kann mit \verb|make compile| (Zeilen 29f) der Code kompiliert werden.
+Der Build des Projekts mit CMAKE wird über den Befehl \verb|make build| (Zeilen 26f) abgestoßen. Mit \verb|make compile|
+(Zeilen 29f) ist die Kompilierung möglich.
 
-Wenn man den Subscale-Algorithmus starten möchte, bietet das Makefile ebenfalls Möglichkeiten, dies vereinfacht zu tun. So kann mit \verb|make start-subscale| (Zeilen 32f) die lokale Ausführung auf einem Rechner gestartet werden. Über \verb|make start-server| (Zeilen 35f) beziehungsweise \verb|make start-client| (Zeilen 38f) kann der Server beziehungsweise Client für die verteilte Ausführung gestartet werden. Wenn man den Server startet, hat man die Möglichkeit den Port, über welchen dieser gestartet werden soll, zu setzten. So kann man mit \verb|make start-server -p=8080| sagen, dass der Server auf den Port 8080 hören soll.
+\verb|make start-subscale| (Zeilen 32f) führt den Subscale-Algorithmus lokal aus. \verb|make start-server| (Zeilen 35f)
+beziehungsweise \verb|make start-client| (Zeilen 38f) startet Server und Client bei einer gewünschten verteilten
+Ausführung. Das Serverkommando bietet außerdem die Möglichkeit zur Übergabe eines Ports, auf welchem der Server lauschen
+soll. \verb|make start-server -p=8080| startet einen Server, welcher über den Port 8080 erreichbar ist.
 
-Falls man einen Server richtig beenden möchte, weil dieser aus unerklärlichen Gründen weiterhin im Hintergrund läuft, kann man dies auch über den Befehl \verb|make kill-server| tun und erspart sich die manuelle PID-Findung.
+\verb|make kill-server| beendet alle im Hintergrund laufenden Server über deren Prozess-ID.
 
-Zuletzt kann auch alles, was durch das Projekt gebaut wurde, wieder mit \verb|make clean| (Zeilen 44f) entfernt werden.
+\verb|make clean| (Zeilen 44f) bereinigt die Maschine von allen gebauten Projektdaten.
 
 \subsection{Umstrukturierung}
-Der Vorgegebene Code war nicht dafür ausgelegt diesen zu verteilen, deshalb muss die Struktur angepasst werden. Dies ist vor allem auch notwendig damit unabhängig voneinander gearbeitet werden kann ohne das Merge-Konflikte entstehen. Der Vorgegebene Code hatte folgende Struktur:
+Beim gegebenen Code handelte es sich um ein Ein-Mann-Projekt. Damit im Team unabhängig und konfliktfrei gearbeitet
+werden kann, muss die Codebasis umstrukturiert werden. Der gegebene Code clusterte sich wie folgt:
 \dirtree{%
 .1 data.
 .1 packages.
@@ -78,7 +103,15 @@ Der Vorgegebene Code war nicht dafür ausgelegt diesen zu verteilen, deshalb mus
 .1 CMakeLists.txt.
 .1 config.json.
 }
-Der Komplette Subscale-Algorithmus befand sich in dem Ordner \textit{SubscaleGPU}, die dazugehörigen Daten in dem \textit{data} Ordner. Zusätzlich benötigte Libraries befanden sich im \textit{packages} Ordner. Die Aktuelle Struktur erschwerte das hinzufügen einer Client-Server-Architektur. Der Code muss umstrukturiert werden, damit gleichzeitig an Client, Server und dem Subscale-Algorithmus gearbeitet werden kann. Der Komplette Subscale Algorithmus wurde in einen eigenen Ordner verschoben und als Statische Library weiterentwickelt, somit kann dieser einfach im Client und Server eingebunden werden. Des Weiteren benötigt sowohl Client als auch Server die Protobuf-Dateien, dafür wurden die .proto-Dateien in einen eigenen Ordner gelegt und von Client und Server verwendet zum Entwickeln der Schnittstellen. Die daraus entstandene Struktur sieht folgendermaßen aus:
+Die Logik für den gesamten Subscale-Algorithmus befand sich im Ordner \textit{SubscaleGPU}. Die zugehörigen Daten im
+\textit{data} Ordner. Zusätzlich benötigte Libraries befanden sich im \textit{packages} Ordner. Die Aktuelle Struktur
+erschwerte die Umwandlung in eine Client-Server-Architektur. Der Code muss umstrukturiert werden, damit gleichzeitig an
+Client, Server und dem Subscale-Algorithmus gearbeitet werden kann. Der gesamte Subscale Algorithmus wurde in einen
+eigenen Ordner verschoben und als statische Library weiterentwickelt. Somit kann dieser im Client und Server
+eingebunden werden. Des Weiteren benötigen sowohl Client als auch Server die Protobuf-Dateien. Für diese wurde ebenfalls
+ein eigener Ordner angelegt. Sowohl Client, als auch Server konsumierten die Schnittstellendefinitionsdateien um daraus
+Skeletons und Stubs zu generieren.
+Die neue Struktur gliederte sich wie folgt:
 
 \dirtree{%
 .1 Client.
@@ -93,16 +126,18 @@ Der Komplette Subscale-Algorithmus befand sich in dem Ordner \textit{SubscaleGPU
 .1 CMakeLists.txt.
 }
 
-\subsection{Aufbau des originalem Code}
-Der originale Code hatte eine Klasse \emph{LocalSubspaceTable}, die für das Darstellen der \emph{Subspace}-Tabelle zuständig war.
-Diese Klasse wurde sowohl für die \emph{Slices} als auch für die gesamten \emph{Subspaces} verwendet. Meine Idee war es dann,
-den anderen im Team eine Funktion names \emph{calculateRemote} bereitzustellen, die als Parameter die \emph{Labels}, den \emph{minBound} des Slices und den 
-\emph{maxBound} des Slices bekommt und den berechneten Slice als Form der \emph{LocalSubspaceTable}-Klasse zurückgibt.
+\subsection{Aufbau der gegebenen Implementierung}
+Die gegebene Implementierung enthält die Klasse \emph{LocalSubspaceTable}, welche die \emph{Subspace}-Tabelle darstellt.
+Diese Klasse wurde sowohl für die Berechnung der \emph{Slices}, als auch für die Berechnung ganzer \emph{Subspaces}
+verwendet. Folglich wurde die Logik mit einer Funktion \emph{calculateRemote} abstrahiert, die als Parameter
+\emph{Labels}, sowie die \emph{min-} und \emph{maxBound} eines Slices erhält, um daraus Einträge für den
+\emph{LocalSubspaceTable} zu generieren.
 
-Im Folgenden wird zunächst der Aufbau des originalen Code erläutert, um anschließend die Umsetzung der \emph{calculateRemote}-Methode
-von unten nach oben darzustellen.\\
+Im Folgenden wird zunächst der Aufbau der gegebenen Implementierung erläutert, um anschließend die Umsetzung der
+\emph{calculateRemote}-Methode zu demonstrieren..\\
 Der Code bestand im wesentlichen aus einer abstrakten Klasse \emph{ISubscale} und zwei konkreten Implementierungen
-\emph{Subscale} (\emph{Cuda}-Implementation) und \emph{SubscaleSec} (normale Implementation) wie im folgenden gezeigt:
+\emph{Subscale} (\emph{Cuda}-Implementierung) und \emph{SubscaleSec} (sequenzielle Implementierung) wie im folgenden
+gezeigt:
 \newpage
 \begin{figure}[h]
     \centering
@@ -111,50 +146,50 @@ Der Code bestand im wesentlichen aus einer abstrakten Klasse \emph{ISubscale} un
     \label{img:subscale}
 \end{figure}
 
-\emph{ISubscale} selber hatte eine Funktion \emph{calculateClusterCandidates} die Vorbereitungen getroffen hat und die 
-konkrete Implementierung sollte die Funktion \emph{calculateAllSlices} überschreiben, die den Zweck hatte, alle \emph{Slices}
-zu erstellen und auf die Festplatte zu schreiben. Außerdem verfügte \emph{ISubscale} noch über eine Funktion \emph{combineAllSlices}
-die die einzelnen Slices von der Festplatte geholt hat, die Slice verengert hat und dann zu der endgültigen Subspace Tabelle 
-hinzugefügt hat.   
+\emph{ISubscale} implementiert die Funktion \emph{calculateClusterCandidates} welche generische vorbereitende Maßnahmen
+für eine konkrete Subscale Implementierung trifft. Die Ausführung des eigentlichen Algorithmus geschieht mit der
+abstrakten Methode \emph{calculateAllSlices}. Diese Methode berechnet alle Slices, je nach eingebundener Implementierung
+entweder sequenziell oder parallel auf der Grafikkarte, und schreibt die Ergebnisse auf die Festplatte. Die abstrakte
+Methode \emph{combineAllSlices} kombiniert alle im vorherigen Schritt berechneten Slices zu einer Tabelle mit möglichen
+Clusterkandidaten.
 
 \subsection{calculateSlice}
-Angefangen am untersten Ende brauchten die beiden konkreten Implementationen eine neue Funktion, die alle nötigen Informationen 
-bekommt, um einen Slice zu erstellen und als Rückgabe dann den Slice zurückgibt. Da sich die konkreten Implementationen nur in der 
-Erzeugung der konkreten Klassen unterscheidet, wird in dieser Section der generelle Code gezeigt und in den folgenden Abschnitten 
-nur die wesentlichen Unterschiede.  
+In einer neuen Funktion wird die Erstellung der Slices abstrahiert. Diese Funktion erhält alle nötigen Informationen
+zur Berechnung eines Slices. Die folgende Sektion behandelt die generischen Funktionalitäten der Funktion. Unterschiede
+der konkreten Implementierung in Ableitungen werden im Anschluss erläutert.
 
 \lstinputlisting[language=C++,caption={calculateSlice},
     label=lst:calculateSlice]{src/calculateSlice.cpp}
 
-Wie in Listing \ref{lst:calculateSlice} zu sehen ist, werden die Berechungsklassen initialisiert und anschließend werden die 
-\emph{DenseUnits} erzeugt, um diese dann in eine Subspace Tabelle hinzuzufügen. Sollte der \emph{Slice} nicht leer sein, dann 
-werden die Einträge noch nach den Subspaces zusammengefügt. Als letztes wird noch der Speicher von der Grafikkarte zum Host kopiert 
-(ist bei der sequentiellen Abarbeitung nicht nötig). 
+Wie in Listing \ref{lst:calculateSlice} zu sehen ist, werden die Berechungsklassen initialisiert und anschließend
+\emph{DenseUnits} erzeugt, um diese einer Subspace Tabelle hinzuzufügen. Sollte der \emph{Slice} nicht leer sein,
+werden die Einträge anhand der Subspaces zusammengefügt. Schlussendlich wird der Speicher der Grafikkarte zum Host
+kopiert (ist bei der sequentiellen Abarbeitung nicht nötig).
 
 \subsection{calculateSlice Sequentiell}
-In dieser Sektion werden noch die spezifischen Erzeugungen der Berechungsklassen für die Sequentielle Abarbeitung gezeigt.
+In dieser Sektion werden die spezifischen Erzeugungen der Berechungsklassen für die sequenzielle Abarbeitung gezeigt.
 
 \lstinputlisting[language=C++,caption={calculateSlice Sequentiell},
     label=lst:calculateSliceSeq]{src/calculateSliceSeq.cpp}
 
 \subsection{calculateSlice Cuda}
-In dieser Sektion werden noch die spezifischen Erzeugungen der Berechungsklassen für die \emph{Cuda} Abarbeitung gezeigt.
+In dieser Sektion werden die spezifischen Erzeugungen der Berechungsklassen für die \emph{Cuda} Abarbeitung gezeigt.
 
 \lstinputlisting[language=C++,caption={calculateSlice Cuda},
     label=lst:calculateSliceCuda]{src/calculateSliceCuda.cpp}
 
 \subsection{calculateClusterCandidatesRemote}
-Die nächst obere Stufe war die \emph{calculateClusterCandidatesRemote}-Methode, die alle notwendigen 
-Informationen für die \emph{calculateSlice} vorbereitet. Diese sieht wie folgt aus:
+Ein vorheriger Schritt, die \emph{calculateClusterCandidatesRemote}-Methode, bereitet alle notwendigen
+Informationen für die \emph{calculateSlice} vor. Diese Methode sieht wie folgt aus:
 
 \lstinputlisting[language=C++,caption={calculateClusterCandidatesRemote},
     label=lst:calculateClusterCandidatesRemote]{src/calculateClusterCandidatesRemote.cpp}
 
-Diese hat die \emph{CoreSets} erzeugt und die weiteren Informationen weiter runter gegeben.
+Diese hat die \emph{CoreSets} erzeugt und die weiteren Informationen in den nächsten Schritt gegeben.
 
 \subsection{calculateRemote}
-Der letzte Schritt war dann, die \emph{calculateRemote}-Methode, die lediglich die \emph{config}
-gelesen hat und dann die konkrete Implementierung des \emph{Subscales} erzeugt hat. 
+Die \emph{calculateRemote}-Methode, ließt schlussendlich die \emph{config} und erzeugt die konkrete Implementierung
+des \emph{Subscales}.
 
 \lstinputlisting[language=C++,caption={calculateRemote},
     label=lst:calculateRemote]{src/calculateRemote.cpp}

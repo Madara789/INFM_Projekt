@@ -1,9 +1,10 @@
 \section{Benchmarking}
-
-Für das Benchmarking wurde von jedem Teammitglied jeweils ein Docker-Container mit Server gestartet. Anschließend wurde auf einem der Cluster-Rechner der Client gestartet und die Ausführung gemessen. Das bedeutet, dass die gesamte Ausführungszeit des Clients das Messergebnis ergibt. Bei der sequentiellen Messung wird ebenfalls innerhalb des Containers der Subscale-Algorithmus gestartet, jedoch nicht die verteilte Version.
+Für das Benchmarking wurde von jedem Teammitglied jeweils ein Docker-Container mit Server gestartet. Anschließend wurde
+auf einem der Cluster-Rechner der Client gestartet und die Ausführung gemessen. Das bedeutet, dass die gesamte
+Ausführungszeit des Clients das Messergebnis ergibt. Bei der sequentiellen Messung wird ebenfalls innerhalb des
+Containers der Subscale-Algorithmus gestartet, jedoch nicht die verteilte Version.
 
 \subsection{Sequentiell}
-
 Die sequentielle Berechnung innerhalb eines Containers ergab die folgende Ausführungszeit.
 
 \begin{center}
@@ -27,7 +28,8 @@ Die sequentielle Berechnung innerhalb eines Containers ergab die folgende Ausfü
     \end{tabular}
 \end{center}
 
-Hierbei ist auffällig, dass sich alle Messungen sehr nahe beieinander Befinden und davon auszugehen ist, dass der gemessene Wert eine gute Basis für einen Vergleich darstellt.
+Hierbei ist auffällig, dass sich alle Messungen sehr nahe beieinander Befinden und davon auszugehen ist, dass der
+gemessene Wert eine gute Basis für einen Vergleich darstellt.
 
 \subsection{Verteilt}
 
@@ -54,11 +56,15 @@ Bei der verteilten Berechnung über mehrere Container und Rechner hinweg ergaben
     \end{tabular}
 \end{center}
 
-Hier gibt es Abweichungen um bis zu einer Sekunde. Eine mögliche Quelle dieser Abweichungen besteht darin, dass das Netzwerk nicht immer gleich auf Anfrage und Antwort reagieren kann, was auf die nicht alleinige Nutzung dieses Netzwerks zurückzuführen ist.
+Hier gibt es Abweichungen um bis zu einer Sekunde. Eine mögliche Quelle dieser Abweichungen besteht darin, dass das
+Netzwerk nicht immer gleich auf Anfrage und Antwort reagieren kann, was auf die nicht alleinige Nutzung dieses Netzwerks
+zurückzuführen ist.
 
 \subsection{Vergleich}
 
-Bei dem Vergleich der durchschnittlichen Laufzeit ist zu erkennen, dass der verteilte Algorithmus langsamer ist als der Sequentielle. In der folgenden Tabelle nochmal die langsamste und schnellste Messung, als auch der Durchschnitt aller Messungen gegenübergestellt.
+Bei dem Vergleich der durchschnittlichen Laufzeit ist zu erkennen, dass der verteilte Algorithmus langsamer ist als der
+sequenzielle. In der folgenden Tabelle nochmal die langsamste und schnellste Messung, als auch der Durchschnitt aller
+Messungen gegenübergestellt.
 
 \begin{center}
     \begin{tabular}{ |c|c|c| }
@@ -72,4 +78,8 @@ Bei dem Vergleich der durchschnittlichen Laufzeit ist zu erkennen, dass der vert
     \end{tabular}
 \end{center}
 
-Die Vermutung liegt nahe, dass der uns zur Verfügung gestellten Testdatensatz nur bedingt für eine effizientere Ausführung durch eine Verteilung geeignet ist, da dieser dafür potenziell zu klein ist. Bei einem Datensatz, welcher noch sehr viel mehr Daten enthält, könnte sich der Overhead, welcher durch den Netzwerkverkehr entsteht, im Verhältnis zu dem lokalen Berechnen wieder lohnen. Jedoch muss dies in einem folgenden Versuch überprüft werden, wenn auch solch ein Datensatz zur Verfügung steht.
+Die Vermutung liegt nahe, dass der uns zur Verfügung gestellten Testdatensatz nur bedingt für eine effizientere
+Ausführung durch eine Verteilung geeignet ist, da dieser dafür potenziell zu klein ist. Bei einem Datensatz, welcher
+noch sehr viel mehr Daten enthält, könnte sich der Overhead, welcher durch den Netzwerkverkehr entsteht, im Verhältnis
+zu dem lokalen Berechnen wieder lohnen. Jedoch muss dies in einem folgenden Versuch überprüft werden, wenn auch solch
+ein Datensatz zur Verfügung steht.

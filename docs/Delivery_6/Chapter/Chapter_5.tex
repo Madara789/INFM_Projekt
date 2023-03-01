@@ -1,49 +1,94 @@
 \section{gRPC}
-Der Subscale-Algorithmus wird per gRPC-Protokoll auf mehrere Server verteilt. Hierfür muss die gRPC-Library in das Projekt eingebunden werden, sowie Benötigte Protobuf-Files für die verwendeten Nachrichten. Nachdem die Library eingebunden ist und die Schnittstelle definiert, ist anhand der Protobuf-Files, muss der Client- und Server-Code implementiert werden. Im Folgenden Abschnitt wird die gRPC-Schnittstelle, mit deren Ausgetauschten Nachrichten und Methoden erläutert. Die Konkrete Implementierung dieser Schnittstelle wird in Kapitel \ref{sec:verteilung} erläutert.
+Der Subscale-Algorithmus wird per gRPC-Protokoll auf mehrere Server verteilt. Hierfür muss die gRPC-Library in das
+Projekt eingebunden werden. Ebenfalls inkludiert werden hier benötigte Protobuf-Files für die verwendeten Nachrichten.
+Nachdem die Library eingebunden und die Schnittstelle definiert ist, muss der Client- und Server-Code implementiert
+werden. Im folgenden Abschnitt wird die gRPC-Schnittstelle, mit deren ausgetauschten Nachrichten und Methoden erläutert.
+Die konkrete Implementierung dieser Schnittstelle wird in Kapitel \ref{sec:verteilung} erläutert.
 
 \subsection{gRPC Schnittstelle}
 \label{sec:grpc}
-Damit der Subscale-Algorithmus verteilt werden kann muss eine Client-Server-Architektur aufgebaut werden. Dazu benötigt es ein Protokoll mit dem Client und Server Kommunizieren. Das hier verwendete Protokoll ist gRPC. Damit mit gRPC ein Client und Server erstellt werden kann, muss eine gemeinsame Schnittstelle definiert werden. Die Schnittstelle wird mittels Protobuf definiert. Hierfür wird Response- und Request-Nachrichten definiert, sowie der Service und dessen Methoden. Der Service wurde folgendermaßen definiert:
+Damit der Subscale-Algorithmus verteilt werden kann muss eine Client-Server-Architektur aufgebaut werden. Dazu benötigt
+es ein Protokoll mit dem Client und Server kommunizieren. Das hier verwendete Protokoll ist gRPC. Damit mit gRPC ein
+Client und Server erstellt werden kann, muss eine gemeinsame Schnittstelle definiert werden. Die Schnittstelle wird
+mittels Protobuf definiert. Hierfür werden Response- und Request-Nachrichten definiert, sowie der Service und dessen
+Methoden. Der Service wurde folgendermaßen definiert:
 \lstinputlisting[firstline=5, lastline=7, breaklines=true, caption={gRPC-Service Definition},label=lst:grpc-service]{src/subscale.proto}
-Dabei wird eine Methode definiert, welche ein \textit{RemoteSubscaleRequest}-Nachricht an den Server sendet und eine \textit{RemoteSubspaceResponse}-Nachricht zurückschickt. Dieser Service wird von dem Server implementiert und der Client kann diesen dann Aufrufen.
+Dabei wird eine Methode definiert, welche ein \textit{RemoteSubscaleRequest}-Nachricht an den Server sendet und eine
+\textit{RemoteSubspaceResponse}-Nachricht zurückschickt. Dieser Service wird von dem Server implementiert und der Client
+kann diesen Aufrufen.
 \\
-Die Request-Nachricht für den Aufruf beinhaltet die zuvor erstellten \textit{lables} des Subscale-Algorithmus, sowie die Minimale- und Maximale Signatur für den zugehörigen Bereich. Die \textit{lables} werden dabei als Liste übertragen, siehe Listing \ref{lst:grpc-request}. 
+Die Request-Nachricht für den Aufruf beinhaltet die zuvor erstellten \textit{lables} des Subscale-Algorithmus, sowie die
+minimale und maximale Signatur für den zugehörigen Bereich. Die \textit{lables} werden dabei als Liste übertragen, siehe
+Listing \ref{lst:grpc-request}.
 \lstinputlisting[firstline=9, lastline=13, breaklines=true, caption={gRPC-Request Message},label=lst:grpc-request]{src/subscale.proto}
 
-Die Response-Nachricht bildet die Subscale-Tabelle ab und besteht aus einer Liste an \textit{Entry}-Nachrichten sowie Drei weiteren Variablen, welche der Subscale-Algorithmus berechnet. Die \textit{Entry}-Nachricht besteht aus einer Liste von \textit{ids} und einer Liste von \textit{dimenisons}. Sie repräsentiert einen Eintrag in der Subscale-Tabelle und somit einen möglichen Cluster Kandidat.
+Die Response-Nachricht bildet die Subscale-Tabelle ab und besteht aus einer Liste an \textit{Entry}-Nachrichten sowie
+drei weiteren Variablen, welche der Subscale-Algorithmus berechnet. Die \textit{Entry}-Nachricht besteht aus einer Liste
+von \textit{ids} und einer Liste von \textit{dimenisons}. Sie repräsentiert einen Eintrag in der Subscale-Tabelle und
+somit einen möglichen Clusterkandidat.
 \lstinputlisting[firstline=15, lastline=26, breaklines=true, caption={gRPC-Response Message},label=lst:grpc-response]{src/subscale.proto}
-Nachdem diese Schnittstelle mittels der Protobuf-Datei definiert ist, kann der Client und Server unabhängig voneinander entwickelt werden.
+Nachdem diese Schnittstelle mittels der Protobuf-Datei definiert ist, kann der Client und Server unabhängig voneinander
+entwickelt werden.
 
 \section{Verteilung}
 \label{sec:verteilung}
-Im Folgenden Abschnitt werden die Implementierung der gRPC-Schnittstellen, sowie die Client- und Server Main Methoden erläutert und Probleme, die währenddessen aufgetreten sind.
+Im Folgenden Abschnitt werden die Implementierung der gRPC-Schnittstellen, sowie die Client- und Server Main-Methoden
+und Probleme, die währenddessen aufgetreten sind erläutert.
 
 \subsection{Client}
 \label{sec:client}
 
-\paragraph{Main-Methode} Der Client Code berechnet die \textit{lables} für die gesamten Punkte sowie Minimale- und Maximale Signatur. Danach wird an jeden Server die \textit{labels}, sowie Minimale- und Maximale Signatur gesendet und dessen Antwort in einen Vektor gespeichert. Damit die keine Race-Conditions entstehen muss das Schreiben in den Vektor synchronisiert werden mittels einem \textit{mutex}. Zum Schluss muss auf alle Server gewartet werden damit die Tabellen zusammengeführt werden können.
+\paragraph{Main-Methode}
+Der Client Code berechnet die \textit{lables} für die gesamten Punkte sowie minimale und maximale Signatur. Danach wird
+an jeden Server die \textit{labels}, sowie minimale und maximale Signatur gesendet und dessen Antwort in einen Vektor
+gespeichert. Damit keine Race-Conditions entstehen, muss das Schreiben in den Vektor synchronisiert werden mittels einem
+\textit{mutex}. Zum Schluss muss auf alle Server gewartet werden damit die Tabellen zusammengeführt werden können.
 \lstinputlisting[language=C++, firstline=105, lastline=122, breaklines=true, caption={Client Main-Methode},label=lst:client-main]{src/Client/Main.cpp}
-Nachdem alle Server den Subscale-Algorithmus ausgeführt haben und die Ergebnisse an den Client zurückgeschickt sind, werden anhand von den \textit{RemoteSubspaceResponse} Objekten die Subspace-Tabelle aufgebaut. Diese Subspace-Tabelle beinhaltet alle möglichen Cluster Kandidaten und kann dem DB-Scan Algorithmus übergeben werden.
+Nachdem alle Server den Subscale-Algorithmus ausgeführt haben und die Ergebnisse an den Client zurückgeschickt sind,
+werden anhand von den \textit{RemoteSubspaceResponse} Objekten die Subspace-Tabelle aufgebaut. Diese Subspace-Tabelle
+beinhaltet alle möglichen Cluster Kandidaten und kann dem DB-Scan Algorithmus übergeben werden.
 
-\paragraph{gRPC-Schnittstelle} Der Client muss anhand der \textit{labels} und Minimalen und Maximalen Signatur das Request Objekt befüllen und dies an den Server senden. Bei Positiver Antwort, wird die Response zurückgegeben und bei negativer Response eine Exception ausgelöst.
+\paragraph{gRPC-Schnittstelle} Der Client muss anhand der \textit{labels} und minimalen und maximalen Signatur das
+Requestobjekt befüllen und dies an den Server senden. Bei positiver Antwort, wird die Response zurückgegeben und bei
+negativer Response eine Exception ausgelöst.
 \lstinputlisting[language=C++, firstline=9, lastline=29, breaklines=true, caption={Client gRPC-Aufruf},label=lst:client-remote]{src/Client/Client.cpp}
 
-\paragraph{Client Konfiguration} Damit der Client die Adressen der Server kennt, wurde eine Config-Datei zum Client hinzugefügt. Diese Konfiguration wird als JSON-Datei hinterlegt und beinhaltet alle Adressen der Server:
+\paragraph{Client Konfiguration}
+Damit der Client die Adressen der Server kennt, wurde eine Config-Datei zum Client hinzugefügt. Diese Konfiguration wird
+als JSON-Datei hinterlegt und beinhaltet alle Adressen der Server:
 \lstinputlisting[breaklines=true, caption={Config beispiel},label=lst:config-example]{src/Client/config.json}
 
-Eine Standard Config-Datei ist im Repository hinterlegt, es kann jedoch eine nicht Versionierte Config-Datei angelegt werden, um die Server Adressen anzupassen.
-Die Config ist als Singelton implementiert und kann mittels der \textit{get}-Methode instantiiert und abgerufen werden. Die Methode prüft dabei auf eine \textit{config.override.json}-Datei, falls diese nicht vorhanden ist wird eine Standard Konfiguration geladen und dabei die Server Adressen als Vektor gespeichert.
+Eine standard Config-Datei ist im Repository hinterlegt, es kann jedoch eine nicht-versionierte Config-Datei angelegt
+werden, um die Serveradressen anzupassen. Die Config ist als Singelton implementiert und kann mittels der
+\textit{get}-Methode instantiiert und abgerufen werden. Die Methode prüft dabei auf eine
+\textit{config.override.json}-Datei. Falls diese nicht vorhanden ist, wird eine Standardkonfiguration geladen und dabei
+die Serveradressen als Vektor gespeichert.
 \lstinputlisting[language=C++, firstline=8, lastline=28, breaklines=true, caption={Client-Config},label=lst:client-config]{src/Client/Config.cpp}
 
 \subsection{gRPC Loadbalancing}
-Die gRPC Library und Implementierung des Service konnte ohne Probleme durchgeführt werden, jedoch gab es Probleme bei den Verwendungen mehrerer Server. Es wurde zuerst versucht pro Anfrage an einen Server einen neuen Client zu erstellen mit einer anderen Adresse, dies funktionierte jedoch nicht. Da gRPC es nicht ermöglicht mehrere Clients zu erstellen und der Code somit immer abstürzte. Nach langem Recherchieren stellte sich heraus, das gRPC eine Loadbalancing Option ermöglicht. Somit kann eine Liste (bzw. ein String mit Komma separierten Adressen) übergeben werden und eine Loadbalancing Eigenschaft. Siehe Listing \ref{lst:client-main} Zeile Drei.
+Die gRPC Library und Implementierung des Service konnte ohne Probleme durchgeführt werden, jedoch gab es Probleme bei
+den Verwendungen mehrerer Server. Es wurde zuerst versucht pro Anfrage an einen Server einen neuen Client zu erstellen
+mit einer anderen Adresse, dies funktionierte jedoch nicht. Da gRPC es nicht ermöglicht mehrere Clients zu erstellen und
+der Code somit immer abstürzte. Nach langem Recherchieren stellte sich heraus, das gRPC eine Loadbalancing Option
+ermöglicht. Somit kann eine Liste (bzw. ein String mit Kommata separierten Adressen) übergeben werden und eine
+Loadbalancing Eigenschaft. Siehe Listing \ref{lst:client-main} Zeile Drei.
 
 \subsection{Server}
 \label{sec:server}
-Der Server Code führt den Kompletten Subscale-Algorithmus aus, dabei nutzt er die übermittelten \textit{lables}, sowie die Minimale und Maximale Signatur, um mögliche Cluster Kandidaten zu berechnen. 
+Der Server Code führt den kompletten Subscale-Algorithmus aus, dabei nutzt er die übermittelten \textit{lables}, sowie
+die minimale und maximale Signatur, um mögliche Clusterkandidaten zu berechnen.
 
-\paragraph{Main-Methode} Die Main Methode Startet den Server, mit dem übergebenen Port und Registriert den Implementierten \textit{SubscaleRoutesService}. Danach wartet dieser auf eingehende Requests von einem Client.
+\paragraph{Main-Methode}
+Die Main-Methode startet den Server, mit dem übergebenen Port und registriert den implementierten
+\textit{SubscaleRoutesService}. Danach wartet dieser auf eingehende Requests von einem Client.
 \lstinputlisting[language=C++, firstline=9, lastline=26, breaklines=true, caption={Server Main-Methode},label=lst:server-main]{src/Server/Main.cpp}
 
-\paragraph{gRPC-Service Implementation} Die Implementation des gRPC-Service startet per aufruf der \textit{Remote::calculateRemote}-Methode den Subscale-Algorithmus. Um die Methode zu verwenden, müssen die \textit{labels} in einen Vektor überführt werden. Das Ergebnis des Subscale-Algorithmus ist ein Tupel, welches die Tabelle mit möglichen Cluster-Kandidaten beinhaltet und eine Anzahl von Einträgen in den Tabellen. Dieses Tupel wird in die \textit{RemoteSubspaceResponse}-Nachricht überführt. Da die gRPC-Nachrichten nicht mit den Vektoren übermittelt werden können, müssen diese dementsprechend umgewandelt werden. Dabei werden beim Überführen Einträge mit einer \textit{dimension} oder \textit{id} Größe von Null herausgefiltert.
+\paragraph{gRPC-Service Implementation}
+Die Implementierung des gRPC-Service startet per Aufruf der \textit{Remote::calculateRemote}-Methode den
+Subscale-Algorithmus. Um die Methode zu verwenden, müssen die \textit{labels} in einen Vektor überführt werden. Das
+Ergebnis des Subscale-Algorithmus ist ein Tupel, welches die Tabelle mit möglichen Cluster-Kandidaten beinhaltet und
+eine Anzahl von Einträgen in den Tabellen. Dieses Tupel wird in die \textit{RemoteSubspaceResponse}-Nachricht überführt.
+Da die gRPC-Nachrichten nicht mit den Vektoren übermittelt werden können, müssen diese dementsprechend umgewandelt
+werden. Dabei werden beim Überführen Einträge mit einer \textit{dimension} oder \textit{id} Größe von Null
+herausgefiltert.
 \lstinputlisting[language=C++, firstline=8, lastline=34, breaklines=true, caption={Server gRPC Implementation},label=lst:server-remote]{src/Server/SubscaleRoutesImpl.cpp}
